@@ -1,0 +1,40 @@
+.banner{
+    display: block;
+    padding: 5px;
+    margin: 0;
+    width: 100vw;
+    height: 80vh;
+    position: relative;
+
+}
+
+.bannerText{
+    position: relative;
+    padding: 20px;
+    top: 100px;
+    z-index: 20;
+    text-align: center;
+    color: rgb(255, 228, 242);
+    box-shadow: 0 4px 8px 0 rgb(255, 189, 36),0 6px 20px 0 rgb(233, 167, 0);
+    border-radius: 40px;
+    background-color: rgb(129, 73, 0, 0.9);
+}
+
+.text_shadow{
+  
+    font-family : serif;
+    text-align: center;
+   font-size: 120px;
+   text-shadow: 2px 2px 5px rgb(75, 83, 7); 
+   border: 100px soilid rgba(0, 0, 0, 0.859);
+}
+
+
+.text_smaller{
+  
+    font-family : serif;
+    text-align: center;
+   font-size: 30px;
+   text-shadow: 6px 7px 10px rgb(0, 0, 1); 
+  
+}

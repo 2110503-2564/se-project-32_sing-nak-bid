@@ -1,0 +1,32 @@
+.menucontainer {
+    height:70px;
+    background-color: rgb(129, 0, 0);
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 30;
+    display: flex;
+ 
+}
+
+
+.logoimg {
+    height: 100%;
+    width: auto;
+    padding: 1;
+    
+}
+
+.itemcontainer {
+   
+    width: 120px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    font-size: 14pt;
+    text-align: center;
+    color: rgb(255, 244, 244);
+   margin-top: auto;
+   margin-bottom: auto;
+   margin-right: auto;
+
+}
