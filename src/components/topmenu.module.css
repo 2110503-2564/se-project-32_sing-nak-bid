@@ -1,29 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Kanit&display=swap");
 .menucontainer {
-    height: 50px;
-    background-color: white;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    z-index: 30;
-    border-top: 1px solid lightgrey;
-    border-bottom: 1px solid lightgrey;
-    display: flex;
-    flex-direction: row;
+  height: 50px;
+  background-color: white;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 30;
+  border-top: 1px solid lightgrey;
+  border-bottom: 1px solid lightgrey;
+  display: flex;
+  flex-direction: row;
 }
 
 .logoimg {
-    height: 100%;
-    width: auto;
+  height: 100%;
+  width: auto;
 }
 
 .itemcontainer {
-    width: 120px;
-    text-align: center;
-    margin-top: auto;
-    margin-bottom: auto;
-    font-family: "Kanit", sans-serif;
-    font-size: 15px;
-    color: gray;
+  width: 120px;
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-family: "Kanit", sans-serif;
+  font-size: 15px;
+  color: gray;
 }
