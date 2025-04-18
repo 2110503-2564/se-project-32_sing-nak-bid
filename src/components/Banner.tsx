@@ -28,7 +28,6 @@ export default function Banner() {
       />
 
       <div className="absolute top-[30%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white text-center p-4 z-20">
-
         <h1 className="text-5xl font-medium">Find Your Perfect Stay</h1>
         <h3 className="text-2xl font-medium">Book. Relax. Enjoy.</h3>
       </div>

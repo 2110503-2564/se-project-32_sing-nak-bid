@@ -10,8 +10,8 @@
     "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
   --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  --background-start-rgb: 244, 236, 221;
+  --background-end-rgb: 255, 246, 231;
 
   --primary-glow: conic-gradient(
     from 180deg at 50% 50%,
@@ -46,9 +46,11 @@
 
 @media (prefers-color-scheme: light) {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 244, 236, 221;
+    
+    /* Set both start and end color to the same value for a single solid background */
+    --background-start-rgb: 255, 255, 255;  /* Light background color */
+    --background-end-rgb: 255, 249, 238;    /* Same color to make it solid */
 
     --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
     --secondary-glow: linear-gradient(
@@ -90,6 +92,11 @@ body {
 }
 
 body {
+  background: linear-gradient(
+    135deg, /* Direction of the gradient */
+    rgb(var(--background-start-rgb)),  /* Starting color */
+    rgb(var(--background-end-rgb))     /* Ending color */
+  );
   color: rgb(var(--foreground-rgb));
   margin-top: 50px;
 }
