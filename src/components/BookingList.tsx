@@ -1,84 +1,92 @@
+"use client";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { getReservations } from "@/libs/getReservations"; // You need to create/get this function
-import { RestaurantJson } from "../../interface";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
-import DeleteEditBooking from "./EditDeleteReservation";
-// Define the Restaurant and Reservation types
-interface Restaurant {
-  _id: string;
-  name: string;
-  address: string;
-  id: string;
-}
+import { useRouter } from "next/navigation";
+import { BookingsItem, BookingJson } from "../../interfaces";
+import getBookings from "@/libs/getBookings";
+import deleteBooking from "@/libs/deleteBooking";
 
-interface Reservation {
-  _id: string;
-  reservationDate: string;
-  user: string;
-  restaurant: Restaurant; // restaurant is an object of type Restaurant
-  status: string;
-  createdAt: string;
-}
+export default function BookingList() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [bookingsItems, setBookingItems] = useState<BookingsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-interface ReservationJson {
-  success: boolean;
-  count: number;
-  pagination: object;
-  data: Reservation[];
-}
+  const handleRemoveBooking = async (id: string) => {
+    if (!session?.user?.token) return;
 
-export default async function ReservationList({
-  reservationJson,
-  restaurantJson,
-}: {
-  reservationJson: Promise<ReservationJson>;
-  restaurantJson: Promise<RestaurantJson>;
-}) {
-  const bookingsJsonResult = await reservationJson;
-  const campsJsonResult = await restaurantJson;
-  const session = await getServerSession(authOptions);
+    const isConfirmed = window.confirm(
+      "Are you sure you want to remove this booking?"
+    );
+    if (!isConfirmed) return;
 
+    try {
+      await deleteBooking(id, session.user.token);
+      setBookingItems((prev) => prev.filter((item) => item._id !== id));
+    } catch (error) {
+      console.error("Failed to delete booking:", error);
+    }
+  };
 
-  if (!session) return null;
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!session?.user?.token) return;
+      try {
+        setLoading(true);
+        const bookings: BookingJson = await getBookings(session.user.token);
+        setBookingItems(bookings.data);
+      } catch (error) {
+        console.error("Failed to fetch bookings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    if (session?.user?.token) {
+      fetchBookings();
+    }
+  }, [session?.user?.token]);
 
+  if (status === "loading" || loading) {
+    return <div>Loading bookings...</div>;
+  }
 
   return (
-    <div >
-      {bookingsJsonResult.count > 0 ? (
-        // If there are bookings
-        bookingsJsonResult.data.map(
-          (
-            booking: Reservation // Explicitly define the type of 'booking'
-          ) => (
-            <div
-              key={booking.reservationDate} // Added a key prop to avoid React warning
-              className="bg-[#f0e5da] rounded px-5 mx-5 py-2 my-9" // Changed to a brown-gray color
-            >
-              <div className="text-3xl px-3 font-semibold font-sans text-blue-800">
-                Restaurant : {booking.restaurant.name}
-              </div>
-              <div className="mx-3 font-sans text-xl font-semibold py-1 text-pink-700">
-                {new Date(booking.reservationDate).toLocaleDateString("en-GB", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </div>
-              <div className="text-sm px-3 font-sans text-pink-700">user: {booking.user}</div>
-              <div className="text-sm px-3 font-sans text-pink-700">
-                Reservation: {booking.restaurant.name}
-              </div>
-              <DeleteEditBooking reservationDate={booking.reservationDate} restaurantId={booking.restaurant._id} reservationId={booking._id} />
+    <div className="p-4">
+      {bookingsItems.length > 0 ? (
+        bookingsItems.map((bookingsItem, index) => (
+          <div key={index} className="bg-white shadow-md rounded-lg mb-4 p-6">
+            <div className="text-lg text-gray-600 mb-4">
+              <span className="font-medium">Hotel:</span>{" "}
+              {bookingsItem.hotel.name}
             </div>
-          )
-        )
+            <div className="text-lg text-gray-600 mb-4">
+              <span className="font-medium">Booked Date:</span>{" "}
+              {bookingsItem.bookingDate}
+            </div>
+            <div className="text-lg text-gray-600 mb-4">
+              <span className="font-medium">Nights:</span> {bookingsItem.nights}
+            </div>
+            <div className="flex space-x-2">
+              <button
+                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-red-500 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-red-300 hover:text-black"
+                onClick={() => handleRemoveBooking(bookingsItem._id)}
+              >
+                <span className="relative z-10">Remove Booking</span>
+              </button>
+
+              <button
+                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
+                onClick={() => router.push(`/update/${bookingsItem._id}`)}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        ))
       ) : (
-        // If there are no bookings
-        <div className="text-center text-xl font-new-york text-red-700">
-          No Restaurant Reservation
+        <div className="text-xl text-center text-gray-600">
+          No Hotel Booking Available.
         </div>
       )}
     </div>

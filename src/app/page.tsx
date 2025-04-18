@@ -1,23 +1,12 @@
-
-import Banner from '@/components/Banner';
-import BannerDown from '@/components/Banner_down';
-import AdsWeb from '@/components/AdsWeb';
+import Image from "next/image";
+import Banner from "../components/Banner";
+import styles from "./page.module.css";
+import Card from "../components/Card";
 
 export default function Home() {
   return (
-    <main >
-      
+    <main className={styles.main}>
       <Banner/>
-
-      
-<div className='flex items-center justify-center'>
-    <AdsWeb/>
-    </div>
-   
- 
-    <BannerDown/>
-   
-
     </main>
   );
 }

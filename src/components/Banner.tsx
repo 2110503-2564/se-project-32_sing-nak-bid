@@ -1,40 +1,56 @@
-'use client'
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
-import { useSession } from 'next-auth/react';
-import { useState } from 'react';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import styles from './banner.module.css'
+export default function Banner() {
+  const covers = [
+    "/img/cover.jpg",
+    "/img/cover2.jpg",
+    "/img/cover3.jpg",
+    "/img/cover4.jpg",
+  ];
+  const [index, setIndex] = useState(0);
+  const { data: session } = useSession();
+  const router = useRouter();
 
-export default function Banner(){
-    // const {data : session} = useSession()
-    // console.log(session?.user.token)
+  return (
+    <div
+      className="relative w-screen h-[50vh] p-1 overflow-hidden cursor-pointer flex items-center justify-center"
+      onClick={() => setIndex(index + 1)}
+    >
+      <Image
+        src={covers[index % 4]}
+        alt="cover"
+        fill
+        className="object-cover"
+      />
 
-    const router = useRouter();
+      <div className="absolute top-[30%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white text-center p-4 z-20">
 
-    return (
-<div className={styles.banner} >
-<video src='/vdo/restaurant.mp4' className=' absolute top-0 left-0 w-full h-full object-cover '
-autoPlay loop muted/>
-<div className='relative px-5 py-4 mt-24 z-20 text-center text-pink-100  '> 
-    <h1 className={styles.text_shadow} >Pom Pen Gamer</h1>
-<div>
-    <h3 className={styles.text_smaller}>A Restaurant Reservation for Gamer & Cat Lover ᓚ₍ ^. .^₎</h3> </div>
-</div>
+        <h1 className="text-5xl font-medium">Find Your Perfect Stay</h1>
+        <h3 className="text-2xl font-medium">Book. Relax. Enjoy.</h3>
+      </div>
 
-{/* {
-    session ? <div className='z-30 absolute top-5 right-10 font-semibold text-white text-xl'>  Welcome {session.user.name} </div> : null
-} */}
-   <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2  mt-10">
-<button className='bg-yellow-300 text-yellow-900 border-yellow-900 
-font-semibold py-2 px-2 mx-5 my-5 rounded  text-4xl font-serif
-hover:bg-red-600 hover:text-white hover:border-transparent'
-onClick={(e)=>{e.stopPropagation(); router.push('/restaurants')}}>Select Restaurant</button>
-   </div>
-</div>
+      {session && (
+        <div className="absolute top-5 right-10 font-semibold text-cyan-800 text-xl z-30">
+          Hello {session.user?.name}
+        </div>
+      )}
 
-
-    );
+      <div className="absolute inset-0 flex items-center justify-center z-30 mt-10 mt-10">
+        <button
+          className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-gray-800 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-white hover:text-black"
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push("/hotels");
+          }}
+        >
+          <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span>
+          <span className="relative z-10">View Our Hotels</span>
+        </button>
+      </div>
+    </div>
+  );
 }
-
-
