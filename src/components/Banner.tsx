@@ -3,6 +3,8 @@ import { useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import styles from './Button.module.css';
+//import button style from css file
 
 export default function Banner() {
   const covers = [
@@ -40,13 +42,15 @@ export default function Banner() {
 
       <div className="absolute inset-0 flex items-center justify-center z-30 mt-10 mt-10">
         <button
-          className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-gray-800 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-white hover:text-black"
+          className={styles['button']}
           onClick={(e) => {
             e.stopPropagation();
             router.push("/hotels");
           }}
         >
-          <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span>
+
+        {/* เปลี่ยนปุ่มเป็นแบบใหม่เลยขอคอมเม้นอันนี้ไว้นะ */}
+          {/* <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span> */}
           <span className="relative z-10">View Our Hotels</span>
         </button>
       </div>
