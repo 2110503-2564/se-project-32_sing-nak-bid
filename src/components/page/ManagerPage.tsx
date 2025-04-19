@@ -21,19 +21,41 @@ export default function ManagerPage() {
     e.dataTransfer.setData("text/plain", taskId);
   };
 
-  const onDrop = (e: React.DragEvent<HTMLDivElement>, newStatus: Task["status"]) => {
+  const onDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    newStatus: Task["status"]
+  ) => {
     const taskId = e.dataTransfer.getData("text/plain");
-
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, status: newStatus } : task
-      )
-    );
+  
+    setTasks((prev) => {
+      const taskToMove = prev.find((task) => task.id === taskId);
+      if (!taskToMove) return prev;
+      const filtered = prev.filter((task) => task.id !== taskId);
+      return [...filtered, { ...taskToMove, status: newStatus }];
+    });
   };
-
+  
   const allowDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
   };
+
+  const handleCardClick = (taskId: string) => {
+    setTasks((prev) =>
+      prev.map((task) => {
+        if (task.id !== taskId) return task;
+  
+        const nextStatus: Task["status"] =
+          task.status === "pending"
+            ? "preparing"
+            : task.status === "preparing"
+            ? "complete"
+            : "complete"; 
+  
+        return { ...task, status: nextStatus };
+      })
+    );
+  };
+  
 
   const renderColumn = (status: Task["status"]) => (
     <div
@@ -50,6 +72,7 @@ export default function ManagerPage() {
             className={styles.card}
             draggable
             onDragStart={(e) => onDragStart(e, task.id)}
+            onClick={() => handleCardClick(task.id)}
           >
             {task.title}
           </div>
@@ -58,10 +81,15 @@ export default function ManagerPage() {
   );
 
   return (
-    <div className={styles.board}>
-      {renderColumn("pending")}
-      {renderColumn("preparing")}
-      {renderColumn("complete")}
+    <div>
+      <div className={styles.header}>
+        Order List
+      </div>
+      <div className={styles.board}>
+        {renderColumn("pending")}
+        {renderColumn("preparing")}
+        {renderColumn("complete")}
+      </div>
     </div>
   );
 }
