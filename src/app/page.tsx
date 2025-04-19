@@ -12,6 +12,7 @@ export default async function Home() {
 
   const session = await getServerSession(authOptions);
   console.log("SESSION:", session);
+  //temp check for manager
   const role = session?.user.role || "admin";
 
   return (
