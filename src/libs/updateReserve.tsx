@@ -1,7 +1,6 @@
 export default async function updateReserve(
     id: string,
     reservationDateTime: string,
-    status:string,
     token: string
   ) {
     const response = await fetch(
@@ -13,8 +12,7 @@ export default async function updateReserve(
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          reservationDateTime,
-          status
+          reservationDateTime
         }),
       }
     );
