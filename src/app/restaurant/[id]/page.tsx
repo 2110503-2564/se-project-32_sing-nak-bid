@@ -65,11 +65,13 @@ const RestaurantDetailPage = () => {
 
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-semibold mb-4">{restaurant.name}</h1>
-            <p>Address: {restaurant.address}</p>
-            <p>Tel: {restaurant.tel}</p>
-            <p>Open Time: {restaurant.opentime}</p>
-            <p>Close Time: {restaurant.closetime}</p>
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h1 className="text-3xl font-semibold mb-4">{restaurant.name}</h1>
+                <p className="text-gray-700 mb-2">Address: {restaurant.address}</p>
+                <p className="text-gray-700 mb-2">Tel: {restaurant.tel}</p>
+                <p className="text-gray-700 mb-2">Open Time: {restaurant.opentime}</p>
+                <p className="text-gray-700">Close Time: {restaurant.closetime}</p>
+            </div>
 
             {/* Display Menu Items */}
             {restaurant.menuItems && restaurant.menuItems.length > 0 && (
