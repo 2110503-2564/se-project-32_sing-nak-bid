@@ -1,4 +1,4 @@
-export default async function deleteBooking(id:string,token:string) {
+export default async function deleteReserve(id:string,token:string) {
     const response = await fetch(`https://ya-seleng-back-end.vercel.app/api/v1/bookings/${id}`,
         {
             method: "DELETE",

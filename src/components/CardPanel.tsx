@@ -3,7 +3,7 @@ import Card from "./Card";
 import { useReducer, useState } from "react";
 import { Link } from "@mui/material";
 import { useRef, useEffect } from "react";
-import getHotels from "@/libs/getHotels";
+import getRestaurants from "@/libs/getRestaurants";
 import { HotelItem, HotelJson } from "../../interfaces";
 
 export default function CardPanel() {
@@ -11,7 +11,7 @@ export default function CardPanel() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const hotels = await getHotels();
+      const hotels = await getRestaurants();
       setHotelResponse(hotels);
     };
     fetchData();

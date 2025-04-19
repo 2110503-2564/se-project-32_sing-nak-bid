@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import updateBooking from "@/libs/updateBooking";
+import updateReserve from "@/libs/updateReserve";
 
 export default function UpdateBookingPage() {
   const { id } = useParams() as { id: string };
@@ -23,7 +23,7 @@ export default function UpdateBookingPage() {
     setMessage("");
 
     try {
-      await updateBooking(id, bookingDate, session.user.token);
+      await updateReserve(id, bookingDate, session.user.token);
       setMessage("Booking updated successfully!");
       setTimeout(() => router.push("/"), 1500);
     } catch (error) {

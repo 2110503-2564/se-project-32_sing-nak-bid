@@ -1,4 +1,4 @@
-export default async function addBooking(
+export default async function addReserve(
   night: number,
   bookingDate: string,
   user: string,

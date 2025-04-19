@@ -5,7 +5,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Select, MenuItem, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Dayjs } from "dayjs";
-import getHotels from "@/libs/getHotels";
+import getRestaurants from "@/libs/getRestaurants";
 import { HotelItem, HotelJson } from "../../interfaces";
 
 export default function LocalizationProvider({
@@ -31,7 +31,7 @@ export default function LocalizationProvider({
 
   useEffect(() => {
     const fetchData = async () => {
-      const hotels = await getHotels();
+      const hotels = await getRestaurants();
       setHotelResponse(hotels);
     };
     fetchData();

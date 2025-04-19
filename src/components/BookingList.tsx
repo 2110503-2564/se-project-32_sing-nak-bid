@@ -3,8 +3,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BookingsItem, BookingJson } from "../../interfaces";
-import getBookings from "@/libs/getBookings";
-import deleteBooking from "@/libs/deleteBooking";
+import getReserves from "@/libs/getReserves";
+import deleteReserve from "@/libs/deleteReserve"; 
 
 export default function BookingList() {
   const { data: session, status } = useSession();
@@ -21,7 +21,7 @@ export default function BookingList() {
     if (!isConfirmed) return;
 
     try {
-      await deleteBooking(id, session.user.token);
+      await deleteReserve(id, session.user.token);
       setBookingItems((prev) => prev.filter((item) => item._id !== id));
     } catch (error) {
       console.error("Failed to delete booking:", error);
@@ -33,7 +33,7 @@ export default function BookingList() {
       if (!session?.user?.token) return;
       try {
         setLoading(true);
-        const bookings: BookingJson = await getBookings(session.user.token);
+        const bookings: BookingJson = await getReserves(session.user.token);
         setBookingItems(bookings.data);
       } catch (error) {
         console.error("Failed to fetch bookings:", error);

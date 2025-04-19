@@ -1,7 +1,7 @@
 import { error } from "console"
 import { TIMEOUT } from "dns"
 
-export default async function getBookings(token:string) {
+export default async function getReserves(token:string) {
     await new Promise((resolve)=>setTimeout(resolve, 300))
     
     const response = await fetch("https://ya-seleng-back-end.vercel.app/api/v1/bookings",

@@ -1,4 +1,4 @@
-import getHotel from "@/libs/getHotel";
+import getRestaurant from "@/libs/getRestaurant";
 import Image from "next/image";
 import { HotelJson, HotelItem } from "../../../../../interfaces";
 import Link from "next/link";
@@ -8,7 +8,7 @@ export default async function VenueDetailPage({
 }: {
   params: { vid: string };
 }) {
-  const hotelJson = await getHotel(params.vid);
+  const hotelJson = await getRestaurant(params.vid);
   const hotelDetail = hotelJson.data;
 
   return (

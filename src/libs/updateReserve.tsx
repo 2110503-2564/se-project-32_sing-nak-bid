@@ -1,4 +1,4 @@
-export default async function updateBooking(
+export default async function updateReserve(
     id: string,
     bookingDate: string,
     token: string

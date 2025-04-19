@@ -10,7 +10,7 @@ import { BookingItem } from "../../../interfaces";
 import ErrorAlert from "@/components/ErrorAlert";
 import SuccessAlert from "@/components/SuccessAlert";
 import { useSession } from "next-auth/react";
-import addBooking from "@/libs/addBooking";
+import addReserve from "@/libs/addReserve";
 
 export default function Booking() {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,7 +39,7 @@ export default function Booking() {
         night,
       };
       dispatch(reduxBooking(item));
-      addBooking(night, dayjs(reserveDate).format("YYYY-MM-DD"), nameLastname, hotel, session?.user.token);
+      addReserve(night, dayjs(reserveDate).format("YYYY-MM-DD"), nameLastname, hotel, session?.user.token);
       setShowSuccessAlert(true);
       setShowErrorAlert(false);
     } else {
