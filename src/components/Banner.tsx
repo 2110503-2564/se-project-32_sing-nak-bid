@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Input from "./search";
 import styles from './Button.module.css';
 
+
 export default function Banner() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -13,8 +14,6 @@ export default function Banner() {
       
       {/* Animated Background */}
       <div className="relative animated-bg" /> 
-  
-
       <style jsx>{
         `.animated-bg {
           width: 100%;
@@ -33,7 +32,7 @@ export default function Banner() {
             transparent 100%
           );
           background-size: var(--s) var(--s);
-          animation: move 10s infinite linear;
+          animation: move 40s infinite linear;
           position: absolute;
           top: 0;
           left: 0;
@@ -52,36 +51,38 @@ export default function Banner() {
         }
       `}</style>
 
-      {/* Content */}
+      {/* For Search Restaurant*/}
       <div className="relative z-10 flex flex-col items-start gap-4 text-left max-w-xl ">
         <h1 className="text-3xl md:text-5xl font-bold text-[#201335]">
-          Search Restaurants
+          Finding Restaurants
         </h1>
         <div className="w-full max-w-md">
           <Input />
         </div>
       </div>
 
-      {/* Greeting */}
+      {/* Greeting User*/}
       {session && (
         <div className="absolute top-5 right-10 font-semibold text-cyan-300 text-xl z-30">
           Hello {session.user?.name}
         </div>
       )}
 
-      {/* View Button - bottom left */}
-      <div className="absolute bottom-5 left-6 z-10">
-        <button
-          className={`group ${styles["button"]}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push("/hotels");
-          }}
+
+
+      {/* View Button - bottom center */}
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 my-2">
+      <button
+        className={`group ${styles["button"]}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          router.push("/hotels");
+        }}
         >
-          <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-            View Restaurants
-          </span>
-        </button>
+      <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+        View Restaurants
+      </span>
+      </button>
       </div>
     </div>
   );
