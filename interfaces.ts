@@ -44,10 +44,10 @@ export interface HotelJSON {
 }
 
 export interface BookingJson {
-  success: boolean,
-  count: number,
-  pagination: Object,
-  data: BookingsItem[]
+  success: boolean;
+  count: number;
+  pagination: Object;
+  data: BookingsItem[];
 }
 
 export interface HotelItemJson {
@@ -55,13 +55,26 @@ export interface HotelItemJson {
   data: HotelItem;
 }
 
-export interface UserJSON{
-  _id: string
-  name: string
-  email: string
-  role: string
-  password: string
-  tel: string
-  isBanned: boolean
-  createAt: string
+export interface UserJSON {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  tel: string;
+  isBanned: boolean;
+  createAt: string;
+}
+
+export interface OrdersItem {
+  _id: string;
+  name: string;
+  quantity: number;
+  note?: string; 
+}
+
+export interface OrderJson {
+  success: boolean;
+  count: number;
+  data: OrdersItem[];
 }
