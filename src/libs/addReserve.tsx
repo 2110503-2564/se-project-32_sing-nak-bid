@@ -1,12 +1,11 @@
 export default async function addReserve(
-  night: number,
-  bookingDate: string,
-  user: string,
-  hotelID: string,
+  reservationDateTime: string,
+  status:string,
+  restaurantID: string,
   token: string
 ) {
   const response = await fetch(
-    `https://ya-seleng-back-end.vercel.app/api/v1/hotels/${hotelID}/bookings`,
+    `http://localhost:5000/api/v1/restaurants/${restaurantID}/reservations`,
     {
       method: "POST",
       headers: {
@@ -14,16 +13,15 @@ export default async function addReserve(
         authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        bookingDate,
-        user,
-        nights: night,
+        reservationDateTime,
+        status
       }),
     }
   );
 
   if (!response.ok) {
     console.log(response.json())
-    throw new Error("Failed to create booking");
+    throw new Error("Failed to create reservation");
   } else {
     console.log("success");
   }
