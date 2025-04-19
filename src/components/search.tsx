@@ -30,7 +30,7 @@ const Input = () => {
     <div className="relative flex items-center">
       <input
         placeholder="Search..."
-        className="input shadow-lg  px-5 py-3 rounded-l-xl w-56 transition-all focus:w-64 outline-none"
+        className="input shadow-lg px-5 py-3 rounded-l-xl w-full max-w-lg transition-all outline-none"
         name="search"
         type="search"
         value={searchText}

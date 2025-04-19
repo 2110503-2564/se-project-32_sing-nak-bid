@@ -51,39 +51,23 @@ export default function Banner() {
         }
       `}</style>
 
-      {/* For Search Restaurant*/}
-      <div className="relative z-10 flex flex-col items-start gap-4 text-left max-w-xl ">
-        <h1 className="text-3xl md:text-5xl font-bold text-[#201335]">
-          Finding Restaurants
-        </h1>
-        <div className="w-full max-w-md">
-          <Input />
-        </div>
-      </div>
+      {/* Top-centered Title & Search */}
+<div className="absolute z-10 top-22 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-4 text-center">
+  <h1 className="text-3xl md:text-5xl font-bold text-[#201335]">
+    Finding Restaurants
+  </h1>
+  <div className="w-full max-w-md">
+    <Input />
+  </div>
+</div>
 
       {/* Greeting User*/}
       {session && (
-        <div className="absolute top-5 right-10 font-semibold text-cyan-300 text-xl z-30">
+        <div className="absolute top-5 right-10 font-semibold text-cyan-400 text-xl z-3 mx-10">
           Hello {session.user?.name}
         </div>
       )}
 
-
-
-      {/* View Button - bottom center */}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10 my-2">
-      <button
-        className={`group ${styles["button"]}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          router.push("/hotels");
-        }}
-        >
-      <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-        View Restaurants
-      </span>
-      </button>
-      </div>
     </div>
   );
 }
