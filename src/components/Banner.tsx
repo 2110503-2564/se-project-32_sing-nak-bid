@@ -1,62 +1,86 @@
 "use client";
-import { useState } from "react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Input from "./search"; // Adjust path if needed
+import Input from "./search";
 import styles from './Button.module.css';
-//import button style from css file
 
 export default function Banner() {
-  const covers = [
-    "/img/cover.jpg",
-    "/img/cover2.jpg",
-    "/img/cover3.jpg",
-    "/img/cover4.jpg",
-  ];
-  const [index, setIndex] = useState(0);
   const { data: session } = useSession();
   const router = useRouter();
 
   return (
-    <div
-      className="relative w-screen h-[50vh] p-1 overflow-hidden cursor-pointer flex items-center justify-center py-1"
-      onClick={() => setIndex(index + 1)}
-    >
-      <Image
-        src={covers[index % 4]}
-        alt="cover"
-        fill
-        className="object-cover"
-      />
+    <div className="w-full h-[0vh] flex items-center justify-start">
+      
+      {/* Animated Background */}
+      <div className="relative animated-bg" /> 
+  
 
-      <div className="absolute top-[30%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black bg-opacity-70 text-white text-center p-4 z-20">
-        <h1 className="text-5xl font-medium">Find Your Perfect Stay</h1>
-        <h3 className="text-2xl font-medium">Book. Relax. Enjoy.</h3>
+      <style jsx>{
+        `.animated-bg {
+          width: 100%;
+          height: 27%;
+          --s: 100px;
+          --c-inner: #ED8265;
+          --c-outer: #f2c0ae;
+          --c-outer2: #fff0eb;
+
+          background: radial-gradient(
+            circle at 50% 99%,
+            transparent 10%,
+            var(--c-inner) 10% 30%,
+            var(--c-outer) 30% 60%,
+            var(--c-outer2) 60% 100%,
+            transparent 100%
+          );
+          background-size: var(--s) var(--s);
+          animation: move 10s infinite linear;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 0;
+        }
+
+        @keyframes move {
+          from {
+            background-position: 0 0;
+          }
+          to {
+            background-position: 100% 0;
+          }
+        }
+      `}</style>
+
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-start gap-4 text-left max-w-xl ">
+        <h1 className="text-3xl md:text-5xl font-bold text-[#201335]">
+          Search Restaurants
+        </h1>
+        <div className="w-full max-w-md">
+          <Input />
+        </div>
       </div>
 
+      {/* Greeting */}
       {session && (
-        <div className="absolute top-5 right-10 font-semibold text-cyan-800 text-xl z-30">
+        <div className="absolute top-5 right-10 font-semibold text-cyan-300 text-xl z-30">
           Hello {session.user?.name}
         </div>
       )}
 
-      <div className="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/1 z-30 ">
-        <Input /> {/* Render your Search component here */}
-      </div>
-
-      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-30">
+      {/* View Button - bottom left */}
+      <div className="absolute bottom-5 left-6 z-10">
         <button
-          className={styles['button']}
+          className={`group ${styles["button"]}`}
           onClick={(e) => {
             e.stopPropagation();
             router.push("/hotels");
           }}
         >
-
-        {/* เปลี่ยนปุ่มเป็นแบบใหม่เลยขอคอมเม้นอันนี้ไว้นะ */}
-          {/* <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span> */}
-          <span className="relative z-10">View Our Hotels</span>
+          <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+            View Restaurants
+          </span>
         </button>
       </div>
     </div>
