@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Input from "./search"; // Adjust path if needed
 
 export default function Banner() {
   const covers = [
@@ -17,7 +18,7 @@ export default function Banner() {
 
   return (
     <div
-      className="relative w-screen h-[50vh] p-1 overflow-hidden cursor-pointer flex items-center justify-center"
+      className="relative w-screen h-[50vh] p-1 overflow-hidden cursor-pointer flex items-center justify-center py-1"
       onClick={() => setIndex(index + 1)}
     >
       <Image
@@ -38,7 +39,11 @@ export default function Banner() {
         </div>
       )}
 
-      <div className="absolute inset-0 flex items-center justify-center z-30 mt-10 mt-10">
+      <div className="absolute top-[50%] left-1/2 transform -translate-x-1/2 -translate-y-1/1 z-30 ">
+        <Input /> {/* Render your Search component here */}
+      </div>
+
+      <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-30">
         <button
           className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-gray-800 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-white hover:text-black"
           onClick={(e) => {
