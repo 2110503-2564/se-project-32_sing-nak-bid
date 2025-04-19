@@ -1,9 +1,10 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import getRestaurantsUser from '@/libs/getRestaurantUser'; // Adjust the import path
 import { Restaurant } from '../../../interfaces';
 import { getFuzzyMatches } from '@/utils/fuzzySearch'; // Ensure this utility exists
+import Link from 'next/link';
 
 interface ApiResponse {
     success: boolean;
@@ -17,6 +18,7 @@ const SearchPage = () => {
     const [searchResults, setSearchResults] = useState<Restaurant[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const router = useRouter();
 
     useEffect(() => {
         const fetchAndSearch = async () => {
@@ -57,9 +59,10 @@ const SearchPage = () => {
             <div className="w-full max-w-2xl space-y-8">
                 {searchResults.length > 0 ? (
                     searchResults.map((restaurant) => (
-                        <div
-                            key={restaurant.name}
-                            className="bg-white rounded-xl shadow-2xl hover:scale-105 transition duration-300 overflow-hidden"
+                        <Link
+                            key={restaurant._id} // ใช้ _id เป็น Key เนื่องจากเป็น Unique Identifier
+                            href={`/restaurant/${restaurant._id}`}
+                            className="block bg-white rounded-xl shadow-2xl hover:scale-105 transition duration-300 overflow-hidden"
                         >
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
                                 <div className="relative aspect-w-16 aspect-h-9 rounded-md overflow-hidden">
@@ -83,7 +86,7 @@ const SearchPage = () => {
                                     <p><span className="font-medium text-gray-700">Close:</span> {restaurant.closetime}</p>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))
                 ) : (
                     <p className="text-center text-lg text-gray-600">No restaurants found matching your search.</p>
