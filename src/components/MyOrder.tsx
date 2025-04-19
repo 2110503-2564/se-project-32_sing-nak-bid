@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { BookingsItem, BookingJson, OrdersItem, OrderJson } from "../../interfaces";
+import { ReservationsItem, ReservationJson, OrdersItem, OrderJson } from "../../interfaces";
 import getOrders from "@/libs/getOrders";
 import deleteOrder from "@/libs/deleteOrder";
 
