@@ -78,3 +78,20 @@ export interface OrderJson {
   count: number;
   data: OrdersItem[];
 }
+
+export interface Restaurant {
+  _id: string; // MongoDB's ObjectId is often represented as a string
+  name: string;
+  address: string;
+  district: string;
+  province: string;
+  postalcode: string;
+  tel: string;
+  region: string;
+  opentime: string;
+  closetime: string;
+  managerId: string; // Or potentially a User interface if you have one
+  // You might include virtuals here if you intend to use them on the client-side
+  reservations?: any[]; // Adjust type if you have a Reservation interface
+  menuItems?: any[];    // Adjust type if you have a MenuItem interface
+}
