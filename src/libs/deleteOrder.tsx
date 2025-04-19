@@ -1,5 +1,5 @@
-export default async function deleteOrder(id:string,token:string) {
-    const response = await fetch(`//delete order api`,
+export default async function deleteOrder(id:string,token:string,) {
+    const response = await fetch(`/api/v1/reservations/:reservationId/order/:orderId`,
         {
             method: "DELETE",
             headers: {

@@ -3,9 +3,9 @@ import { TIMEOUT } from "dns"
 import { HotelItemJson } from "../../interfaces";
 
 export default async function getRestaurant(id:string) {
-    const response = await fetch(`https://ya-seleng-back-end.vercel.app/api/v1/hotels/${id}`)
+    const response = await fetch(`http://localhost:5000/api/v1/restaurants/${id}`)
     if(!response.ok){
-        throw new Error("Failed to fetch hotel")
+        throw new Error("Failed to fetch restaurant")
     }
     return await response.json()
 }

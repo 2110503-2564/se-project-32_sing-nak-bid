@@ -1,10 +1,11 @@
 export default async function updateReserve(
     id: string,
-    bookingDate: string,
+    reservationDateTime: string,
+    status:string,
     token: string
   ) {
     const response = await fetch(
-      `https://ya-seleng-back-end.vercel.app/api/v1/bookings/${id}`,
+      `http://localhost:5000/api/v1/reservations/${id}`,
       {
         method: "PUT",
         headers: {
@@ -12,14 +13,15 @@ export default async function updateReserve(
           authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          bookingDate,
+          reservationDateTime,
+          status
         }),
       }
     );
   
     if (!response.ok) {
       console.log(await response.json()); 
-      throw new Error("Failed to update booking");
+      throw new Error("Failed to update reservation");
     }
   
     return await response.json();

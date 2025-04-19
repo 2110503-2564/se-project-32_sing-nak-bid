@@ -1,16 +1,14 @@
 export default async function deleteReserve(id:string,token:string) {
-    const response = await fetch(`https://ya-seleng-back-end.vercel.app/api/v1/bookings/${id}`,
+    const response = await fetch(`http://localhost:5000/api/v1/reservations/${id}`,
         {
             method: "DELETE",
             headers: {
               authorization: `Bearer ${token}`,
-            },body: JSON.stringify({
-                _id : id
-            }),
+            },
         }
     )
     if(!response.ok){
-        throw new Error("Failed to delete")
+        throw new Error("Failed to delete reservation")
     }
     return await response.json()
 }
