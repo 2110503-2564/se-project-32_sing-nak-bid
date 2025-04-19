@@ -12,12 +12,7 @@ export default async function Home() {
 
   const session = await getServerSession(authOptions);
   console.log("SESSION:", session);
-<<<<<<< HEAD
   const role = session?.user.role ;
-=======
-  //temp check for manager
-  const role = session?.user.role || "admin";
->>>>>>> 7e16001715a56dbf731f3e7720544d2e28028e53
 
   return (
     <main className={styles.main}>
