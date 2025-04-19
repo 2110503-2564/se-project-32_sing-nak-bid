@@ -3,7 +3,8 @@ export default async function userLogin(
   userPassword: string
 ) {
   const response = await fetch(
-    "https://ya-seleng-back-end.vercel.app/api/v1/auth/login",
+    // NEW DB
+    "http://localhost:5000/api/v1/auth/login",
     {
       method: "POST",
       headers: {

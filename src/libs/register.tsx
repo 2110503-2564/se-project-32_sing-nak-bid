@@ -5,7 +5,8 @@ export default async function RegisterForm(
     userPassword: string
 ) {
     try {
-        const response = await fetch("https://ya-seleng-back-end.vercel.app/api/v1/auth/register", {
+        //New DB
+        const response = await fetch("http://localhost:5000/api/v1/auth/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
