@@ -39,7 +39,7 @@ export default function Booking() {
         night,
       };
       dispatch(reduxBooking(item));
-      addReserve(night, dayjs(reserveDate).format("YYYY-MM-DD"), nameLastname, hotel, session?.user.token);
+      addReserve( dayjs(reserveDate).format("YYYY-MM-DD"), nameLastname, hotel, session?.user.token);
       setShowSuccessAlert(true);
       setShowErrorAlert(false);
     } else {

@@ -1,3 +1,4 @@
+"use server"
 export default async function RegisterForm(
     userName: string,
     userTel: string,
@@ -16,11 +17,15 @@ export default async function RegisterForm(
                 email: userEmail,
                 password: userPassword,
                 role: "user",
-                tel: userTel,
+                telnumber: userTel,
             }),
         });
 
         if (!response.ok) {
+            console.log(userEmail)
+            console.log(userName)
+            console.log(userPassword)
+            console.log(userTel)
             console.error("Registration failed:", response.status, response.statusText);
             const errorData = await response.json();
             console.error("Error details:", errorData);
