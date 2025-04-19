@@ -19,17 +19,6 @@ export default async function TopMenu() {
       {/* Added User Dropdown */}
       <div className="flex items-center space-x-4 ml-auto">
         <UserDropdown />
-        {/* {session ? (
-          <Link href="/api/auth/signout?callbackUrl=/">
-            <div className="text-cyan-600 text-sm">
-              Sign-Out of {session?.user?.name}
-            </div>
-          </Link>
-        ) : (
-          <Link href="/api/auth/signin?callbackUrl=/">
-            <div className="text-cyan-600 text-sm">Sign-In</div>
-          </Link>
-        )} */}
       </div>
     </div>
   );
