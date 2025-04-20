@@ -39,6 +39,7 @@ export default function ReservationList() {
         const reservations: ReservationJson = await getReserves(
           session.user.token
         );
+        console.log(reservations)
         setReservationsItems(reservations.data);
       } catch (error) {
         console.error("Failed to fetch reservations:", error);
@@ -74,7 +75,7 @@ export default function ReservationList() {
             </div>
             <div className="text-lg text-gray-600 mb-4">
               <span className="font-medium">Reservation Date:</span>{" "}
-              {reservationsItem.reservationDate}
+              {reservationsItem.reservationDateTime}
             </div>
             <div className="flex space-x-2">
               <button

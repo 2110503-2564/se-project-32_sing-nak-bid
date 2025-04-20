@@ -1,38 +1,27 @@
-'use client'
+"use client";
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { ReservationsItem, ReservationJson, OrdersItem, OrderJson } from "../../interfaces";
+import {
+  ReservationsItem,
+  ReservationJson,
+  OrdersItem,
+  OrderJson,
+} from "../../interfaces";
 import getOrders from "@/libs/getOrders";
+import getOrder from "@/libs/getOrder";
 import deleteOrder from "@/libs/deleteOrder";
 
-{/* <div class="w-[250px] bg-white rounded-[10px] border border-silver p-[10px] m-[5px]">
+{
+  /* <div class="w-[250px] bg-white rounded-[10px] border border-silver p-[10px] m-[5px]">
   <!-- content -->
-</div> */}
+</div> */
+}
 
 export default function MyOrder() {
-
-  
-
   const { data: session, status } = useSession();
   const [ordersItems, setOrdersItems] = useState<OrdersItem[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const handleRemoveOrder = async (id: string) => {
-    if (!session?.user?.token) return;
-
-    const isConfirmed = window.confirm(
-      "Are you sure you want to remove this Order?"
-    );
-    if (!isConfirmed) return;
-
-    try {
-      await deleteOrder(id, session.user.token);
-      setOrdersItems((prev) => prev.filter((item) => item._id !== id));
-    } catch (error) {
-      console.error("Failed to delete Order:", error);
-    }
-  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -40,6 +29,7 @@ export default function MyOrder() {
       try {
         setLoading(true);
         const orders: OrderJson = await getOrders(session.user.token);
+        console.log("Fetched orders:", orders);
         setOrdersItems(orders.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
@@ -52,6 +42,29 @@ export default function MyOrder() {
       fetchOrders();
     }
   }, [session?.user?.token]);
+
+  const handleRemoveOrder = async (orderId: string) => {
+    if (!session?.user?.token) return;
+
+    const isConfirmed = window.confirm(
+      "Are you sure you want to remove this Order?"
+    );
+    if (!isConfirmed) return;
+
+    try {
+      for (const ordersItem of ordersItems) {
+        await deleteOrder(
+          ordersItem.reservation._id,
+          orderId,
+          session.user.token
+        );
+      }
+
+      setOrdersItems([]);
+    } catch (error) {
+      console.error("Failed to delete Order:", error);
+    }
+  };
 
   //Loading
   if (status === "loading" || loading) {
@@ -75,7 +88,9 @@ export default function MyOrder() {
                   key={i}
                   className="absolute w-[90%] h-[90%] bg-white/60 rounded-md"
                   style={{
-                    animation: `page-flip 2.5s ease-in-out ${i * 0.3}s infinite`,
+                    animation: `page-flip 2.5s ease-in-out ${
+                      i * 0.3
+                    }s infinite`,
                     transformOrigin: "left",
                     backfaceVisibility: "hidden",
                   }}
@@ -91,61 +106,78 @@ export default function MyOrder() {
         </div>
       </div>
     );
-  }  
+  }
 
-    return (
-      <div className="p-10 space-y-5 min-h-screen" style={{ backgroundColor: '#f4ecdd' }}>
+  return (
+    <div
+      className="p-10 space-y-5 min-h-screen"
+      style={{ backgroundColor: "#f4ecdd" }}
+    >
+      {ordersItems.length > 0 ? (
+        ordersItems.map((ordersItem, index) => (
+          <div
+            key={index}
+            className="w-full rounded-[10px] border p-6 shadow"
+            style={{
+              backgroundColor: "#ED8265",
+              borderColor: "#AC6643",
+              color: "#201335",
+            }}
+          >
+            {ordersItem.orderItems.map((item) => (
+              <div>
+                <div key={item._id} className="mb-4 bg-white/40 p-3 rounded-md">
+                  <div className="text-lg mb-1">
+                    <span className="font-semibold">Menu:</span>{" "}
+                    {item.menuItem.name}
+                  </div>
 
-        {ordersItems.length > 0 ?(
-          ordersItems.map((ordersItem, index) => (
-          <div key={index} className="w-full rounded-[10px] border p-6 shadow"
-          style={{
-            backgroundColor: '#ED8265',
-            borderColor: '#AC6643',
-            color: '#201335'
-          }}>
-            <div className="text-lg mb-4">
-              <span className="font-semibold">Menu:</span>{" "}
-              {ordersItem.name}
-            </div>
-            <div className="text-lg mb-4">
-              <span className="font-semibold">Quantity:</span>{" "}
-              {ordersItem.quantity}
-            </div>
-            {ordersItem.note === "" ? ( 
-            <div className="text-lg mb-4">
-              <span className="font-semibold">Note:</span> {ordersItem.note}
-            </div>
-            ): "" };
-            <div className="flex space-x-2">
-              <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-500"
-                style={{
-                  backgroundColor: '#AC6643',
-                  borderColor: '#201335',
-                  color: '#f4ecdd'
-                }}
-                onClick={() => handleRemoveOrder(ordersItem._id)}
-              >
-                <span className="relative z-10">Remove Orders</span>
-              </button>
+                  <div className="text-lg mb-1">
+                    <span className="font-semibold">Quantity:</span>{" "}
+                    {item.quantity}
+                  </div>
+                  <div className="text-lg mb-1">
+                    <span className="font-semibold">Note:</span>{" "}
+                    {item.note || "-"}
+                  </div>
+                  <div className="text-lg mb-1">
+                    <span className="font-semibold">
+                      Price: {item.menuItem.price}
+                    </span>{" "}
+                    ฿
+                  </div>
+                  <div className="text-lg mb-1">
+                    <span className="font-semibold">Description:</span>
+                    {item.menuItem.description}
+                  </div>
+                </div>
+                
+              </div>
+            
+            ))}
 
-
-              {/* <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
-                onClick={() => router.push(`/update/${ordersItem._id}`)}
-              >
-                Update
-              </button> */}
-            </div>
+                  <div className="flex space-x-2 mt-4">
+                    <button
+                      className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-500"
+                      style={{
+                        backgroundColor: "#AC6643",
+                        borderColor: "#201335",
+                        color: "#f4ecdd",
+                      }}
+                      onClick={() => {
+                        handleRemoveOrder(ordersItem._id);
+                      }}
+                    >
+                      <span className="relative z-10">Remove Orders</span>
+                    </button>
+                  </div>
           </div>
-          ))
-        ):(<div className="text-xl text-center" style={{ color: '#201335' }}>
+        ))
+      ) : (
+        <div className="text-xl text-center" style={{ color: "#201335" }}>
           No Order on this Reservation.
         </div>
-        )}
-
-
-      </div>
-    )
-  }
+      )}
+    </div>
+  );
+}

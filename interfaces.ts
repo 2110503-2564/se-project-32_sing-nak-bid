@@ -1,3 +1,96 @@
+export interface UserJSON {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  tel: string;
+  isBanned: boolean;
+  createAt: string;
+}
+
+
+export interface OrderJson {
+  success: boolean;
+  count: number;
+  data: OrdersItem[];
+}
+
+export interface Restaurant {
+  _id: string; // MongoDB's ObjectId is often represented as a string
+  name: string;
+  address: string;
+  district: string;
+  province: string;
+  postalcode: string;
+  tel: string;
+  region: string;
+  opentime: string;
+  closetime: string;
+  managerId: string; // Or potentially a User interface if you have one
+  // You might include virtuals here if you intend to use them on the client-side
+  reservations?: any[]; // Adjust type if you have a Reservation interface
+  menuItems?: any[];    // Adjust type if you have a MenuItem interface
+}
+
+export interface ReservationJson {
+  success: boolean;
+  count: number;
+  pagination: object;
+  data: ReservationsItem[];
+}
+
+
+export interface ReservationsItem {
+  _id: string;
+  reservationDateTime: string;
+  user: string; // This is a user ID
+  restaurant: Restaurant; // This is a restaurant ID
+  status: string;
+  createdAt: string;
+}
+
+export interface RestaurantJson {
+  success: boolean,
+  count: number,
+  pagination: Object,
+  data: Restaurant[]
+}
+
+export interface MenuItem {
+  _id: string;
+  name: string;
+  price: number;
+  description: string;
+}
+
+export interface OrderItem {
+  _id: string;
+  menuItem: MenuItem[];
+  quantity: number;
+  note?: string;
+}
+
+export interface OrdersItem {
+  _id: string;
+  reservation: ReservationsItem;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface A {
+  b: B[];
+}
+
+export interface B {
+  c: C[];
+}
+
+export interface C {
+  c: string;
+}
 // export interface HotelItem {
 //   _id: string;
 //   name: string;
@@ -54,68 +147,3 @@
 //   success: boolean;
 //   data: HotelItem;
 // }
-
-export interface UserJSON {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  password: string;
-  tel: string;
-  isBanned: boolean;
-  createAt: string;
-}
-
-export interface OrdersItem {
-  _id: string;
-  name: string;
-  quantity: number;
-  note?: string; 
-}
-
-export interface OrderJson {
-  success: boolean;
-  count: number;
-  data: OrdersItem[];
-}
-
-export interface Restaurant {
-  _id: string; // MongoDB's ObjectId is often represented as a string
-  name: string;
-  address: string;
-  district: string;
-  province: string;
-  postalcode: string;
-  tel: string;
-  region: string;
-  opentime: string;
-  closetime: string;
-  managerId: string; // Or potentially a User interface if you have one
-  // You might include virtuals here if you intend to use them on the client-side
-  reservations?: any[]; // Adjust type if you have a Reservation interface
-  menuItems?: any[];    // Adjust type if you have a MenuItem interface
-}
-
-export interface ReservationJson {
-  success: boolean;
-  count: number;
-  pagination: object;
-  data: ReservationsItem[];
-}
-
-
-export interface ReservationsItem {
-  _id: string;
-  reservationDate: string;
-  user: string; // This is a user ID
-  restaurant: Restaurant; // This is a restaurant ID
-  status: string;
-  createdAt: string;
-}
-
-export interface RestaurantJson {
-  success: boolean,
-  count: number,
-  pagination: Object,
-  data: Restaurant[]
-}
