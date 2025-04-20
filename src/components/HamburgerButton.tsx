@@ -53,8 +53,12 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute  w-64 overflow-y-auto bg-white border border-gray-200 shadow-lg"
+          className="absolute w-64 overflow-y-auto bg-white border border-gray-200 shadow-lg"
         >
+          {/**Add Home */}
+          <Link href="/">
+            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</div>
+          </Link>
           <Link href="/register">
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Register</div>
           </Link>
