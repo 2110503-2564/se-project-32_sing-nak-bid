@@ -15,7 +15,7 @@ export default async function Home() {
 
   return (
     <main className={styles.main}>
-      {role === "admin" ? <ManagerPage /> : <UserPage />}
+      {role === "manager" ? <ManagerPage /> : <UserPage />}
     </main>
   );
 }

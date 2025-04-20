@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { ReservationsItem, ReservationJson } from "../../interfaces";
 import getReserves from "@/libs/getReserves";
 import deleteReserve from "@/libs/deleteReserve";
-import styles from "../app/mybooking/mybooking.module.css";
+import styles from "../app/myreservation/myreservation.module.css"
 
 export default function ReservationList() {
   const { data: session, status } = useSession();
