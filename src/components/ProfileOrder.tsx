@@ -15,12 +15,12 @@ export default function ProfileOrder(){
                 </svg>
             </div>
             <p className="mt-5 font-semibold text-xl">{session?.user.name}</p>
-            <span className="block text-base font-light">{session?.user.name}</span>
+            <span className="block text-base font-light">{session?.user.email}</span>
 
             <div className="mt-6 w-full h-[2px] bg-[#AC6643] mb-4"></div>
 
             <button className="mt-2 bg-[#AC6643] text-white px-6 py-2 rounded-[8px] font-semibold hover:bg-[#8a4f30] transition-all duration-200"
-                onClick={() => router.push(`/mybooking`)}>
+                onClick={() => router.push(`/myreservation`)}>
                 My Reservation
             </button>
         </div>
