@@ -151,7 +151,7 @@ const RestaurantDetailPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8"> {/* Removed -my-3 and added py-8 */}
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
-        <img src="/img/Jeh-O.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" />
+        <img src="/img/food3.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" />
         <div className="flex justify-between items-start">
           <div className="flex-grow">
             <h1 className="text-3xl font-semibold mb-4 text-red-700">{restaurant.name}</h1>
