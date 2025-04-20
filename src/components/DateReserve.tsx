@@ -22,26 +22,64 @@ export default function DateReserve({
   return (
     <div className="space-y-4 w-full">
       {/* Restaurant Dropdown */}
-      <select
-        value={selectedRestaurantId}
-        onChange={(e) => onRestaurantChange(e.target.value)}
-      >
-        <option value="">Select a restaurant</option>
-        {restaurants.map((r) => (
-          <option key={r._id} value={r._id}>
-            {r.name}
-          </option>
-        ))}
-      </select>
+      <div className="w-full flex justify-center">
+        <div className="w-full max-w-md">
+          <label className="block mb-2 text-base font-medium text-gray-700">
+            Select a restaurant
+          </label>
+          <select
+            value={selectedRestaurantId}
+            onChange={(e) => onRestaurantChange(e.target.value)}
+            className="block w-full px-4 py-3 text-base text-gray-800 bg-white border border-gray-300 rounded-md focus:outline-none focus:border-[#ed8265] focus:ring-0 transition duration-150"
+          >
+            <option value="" disabled>
+              -- Choose a restaurant --
+            </option>
+            {restaurants.map((r) => (
+              <option key={r._id} value={r._id}>
+                {r.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
 
       {/* Date Picker */}
       <MUILocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-          className="bg-white w-full"
           value={date}
           onChange={(value) => {
             setDate(value);
             onDateChange(value);
+          }}
+          slotProps={{
+            textField: {
+              variant: "outlined",
+              fullWidth: true,
+              InputProps: {
+                className: "bg-white",
+              },
+              InputLabelProps: {
+                shrink: true,
+              },
+              sx: {
+                "& .MuiOutlinedInput-root": {
+                  fontSize: "1rem",
+                  color: "#374151", // text-gray-700
+                  borderRadius: "0.375rem", // rounded-md
+                  "& fieldset": {
+                    borderColor: "#D1D5DB", // border-gray-300
+                  },
+                  "&:hover fieldset": {
+                    borderColor: "#ED8265",
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: "#ED8265",
+                    boxShadow: "none",
+                  },
+                },
+              },
+            },
           }}
         />
       </MUILocalizationProvider>
