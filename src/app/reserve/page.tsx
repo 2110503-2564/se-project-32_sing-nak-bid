@@ -49,10 +49,11 @@ export default function Booking() {
   };
 
   return (
-    <main className="w-full flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
+    //เปลี่ยนคำใน SuccessAlert 
+    <main className="w-full flex flex-col items-center justify-center min-h-screen bg-[#F4ECDD] px-4">
       {/* Alert Messages */}
       {showErrorAlert && <ErrorAlert message="Please fill out all fields" onClose={() => setShowErrorAlert(false)} />}
-      {showSuccessAlert && <SuccessAlert message="Booking successfully completed!" onClose={() => setShowSuccessAlert(false)} />}
+      {showSuccessAlert && <SuccessAlert message="Reservation successfully completed!" onClose={() => setShowSuccessAlert(false)} />}
 
       {/* Booking Card */}
       <div className="bg-white shadow-lg rounded-xl p-8 max-w-md w-full text-center space-y-6">
