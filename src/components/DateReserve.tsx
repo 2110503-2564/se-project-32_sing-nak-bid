@@ -6,33 +6,33 @@ import { Select, MenuItem, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Dayjs } from "dayjs";
 import getRestaurants from "@/libs/getRestaurants";
-import { HotelItem, HotelJson } from "../../interfaces";
+import { ReservationsItem, ReservationJson } from "../../interfaces";
 
 export default function LocalizationProvider({
-  onHotelChange,
+  onRestaurantChange,
   onNameChange,
   onNumberChange,
   onDateChange,
   onNightChange,
 }: {
-  onHotelChange: Function;
+  onRestaurantChange: Function;
   onNameChange: Function;
   onNumberChange: Function;
   onDateChange: Function;
   onNightChange: Function;
 }) {
-  const [hotel, setHotel] = useState("");
+  const [reserve, setReserve] = useState("");
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [date, setDate] = useState<Dayjs | null>(null);
   const [night, setNight] = useState<number>(0);
 
-  const [hotelResponse, setHotelResponse] = useState<HotelJson | null>(null);
+  const [reserveResponse, setReserveResponse] = useState<ReservationJson | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      const hotels = await getRestaurants();
-      setHotelResponse(hotels);
+      const reserves = await getRestaurants();
+      setReserveResponse(reserves);
     };
     fetchData();
   }, []);
@@ -47,9 +47,9 @@ export default function LocalizationProvider({
     setNumber(e.target.value);
   };
 
-  const sortedHotels = hotelResponse?.data.sort((a, b) => {
-    if (a.name.toLowerCase() < b.name.toLowerCase()) return -1;
-    if (a.name.toLowerCase() > b.name.toLowerCase()) return 1;
+  const sortedReserves = reserveResponse?.data.sort((a, b) => {
+    if (a.restaurant.name.toLowerCase() < b.restaurant.name.toLowerCase()) return -1;
+    if (a.restaurant.name.toLowerCase() > b.restaurant.name.toLowerCase()) return 1;
     return 0;
   });
 
@@ -82,21 +82,21 @@ export default function LocalizationProvider({
         value={number}
         onChange={handleNumberChange}
       />
-      <label htmlFor="hotel">Select Hotel</label>
+      <label htmlFor="reserve">Select Reserve</label>
       <Select
         variant="standard"
-        name="hotel"
-        id="hotel"
+        name="reserve"
+        id="reserve"
         className="h-[2em] w-[200px]"
-        value={hotel}
+        value={reserve}
         onChange={(e) => {
-          setHotel(e.target.value);
-          onHotelChange(e.target.value);
+          setReserve(e.target.value);
+          onRestaurantChange(e.target.value);
         }}
       >
-        {sortedHotels?.map((hotelItem: HotelItem) => (
-          <MenuItem key={hotelItem.id} value={hotelItem.id}>
-            {hotelItem.name}
+        {sortedReserves?.map((reserveItem: ReservationsItem) => (
+          <MenuItem key={reserveItem.restaurant._id} value={reserveItem.restaurant._id}>
+            {reserveItem.restaurant.name}
           </MenuItem>
         ))}
       </Select>

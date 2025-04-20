@@ -5,7 +5,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { addBooking as reduxBooking } from "@/redux/features/bookSlice";
+import { addReserve as reduxBooking } from "@/redux/features/reserveSlice";
 import { ReservationsItem } from "../../../interfaces";
 import ErrorAlert from "@/components/ErrorAlert";
 import SuccessAlert from "@/components/SuccessAlert";
@@ -65,7 +65,7 @@ export default function Booking() {
         {/* Input Fields */}
         <div className="flex flex-col items-center space-y-4 w-full">
           <DateReserve
-            onHotelChange={setHotel}
+            onReChange={setHotel}
             onNameChange={setNameLastname}
             onNumberChange={setContactNumber}
             onDateChange={setReserveDate}
