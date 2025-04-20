@@ -55,17 +55,16 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
           ref={dropdownRef}
           className="absolute w-64 overflow-y-auto bg-white border border-gray-200 shadow-lg"
         >
-<<<<<<< HEAD
           <Link href="/" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Main</div>
-=======
+            </Link>
+
           {/**Add Home */}
           <Link href="/">
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</div>
           </Link>
           <Link href="/register">
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Register</div>
->>>>>>> d64f36e5b0e1821242f56517b8f1e4090f678733
           </Link>
           <Link href="/mybooking" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Booking</div>
