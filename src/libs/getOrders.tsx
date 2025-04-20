@@ -1,10 +1,10 @@
 import { error } from "console"
 import { TIMEOUT } from "dns"
 
-export default async function getOrders(token:string,reservationId:string) {
+export default async function getOrders(token:string) {
     await new Promise((resolve)=>setTimeout(resolve, 300))
     
-    const response = await fetch(`http://localhost:5000/api/v1/reservations/${reservationId}/order`,
+    const response = await fetch(`http://localhost:5000/api/v1/order`,
         {
             method: "GET",
             headers: {

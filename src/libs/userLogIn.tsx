@@ -3,8 +3,7 @@ export default async function userLogin(
   userPassword: string
 ) {
   const response = await fetch(
-    // NEW DB
-    "http://localhost:5000/api/v1/auth/login",
+    "http://localhost:5003/api/v1/auth/login",
     {
       method: "POST",
       headers: {
@@ -19,5 +18,13 @@ export default async function userLogin(
   if (!response.ok) {
     throw new Error("Failed to fetch user");
   }
-  return await response.json();
+  const data = await response.json();
+  return {
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    role: data.role,
+    token: data.token,
+    success: data.success,
+  };
 }

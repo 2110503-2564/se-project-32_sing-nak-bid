@@ -58,23 +58,22 @@ export default function UserDropdown() {
         >
           {session ? (
             <>
-              <Link href="/profile">
-                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  Profile
-                </div>
+              <Link href="/profile" onClick={() => setIsOpen(false)}>
+                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Profile</div>
               </Link>
-              <Link href="/api/auth/signout?callbackUrl=/">
-                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                  Sign out of {session?.user?.name}
-                </div>
+              <Link href="/api/auth/signout?callbackUrl=/" onClick={() => setIsOpen(false)}>
+                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Sign out of {session?.user?.name}</div>
               </Link>
             </>
           ) : (
-            <Link href="/api/auth/signin">
-              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                Sign In
-              </div>
+            <>
+            <Link href="/api/auth/signin" onClick={() => setIsOpen(false)}>
+              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Sign In</div>
             </Link>
+            <Link href="/register" onClick={() => setIsOpen(false)}>
+              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Register</div>
+            </Link>
+            </>
           )}
         </div>
       )}

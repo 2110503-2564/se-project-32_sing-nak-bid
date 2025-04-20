@@ -11,7 +11,6 @@ import UserPage from "@/components/page/UserPage";
 export default async function Home() {
 
   const session = await getServerSession(authOptions);
-  console.log("SESSION:", session);
   const role = session?.user.role ;
 
   return (
