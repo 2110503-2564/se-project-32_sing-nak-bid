@@ -149,10 +149,9 @@ const RestaurantDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen -my-3"> {/* Centering Container */}
-      <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2"> {/* Thicker restaurant border */}
-        <img src="/img/Jeh-O.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" /> {/* Restaurant Image */}
-        
+    <div className="flex flex-col items-center justify-center min-h-screen py-8"> {/* Removed -my-3 and added py-8 */}
+      <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
+        <img src="/img/food3.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" />
         <div className="flex justify-between items-start">
           <div className="flex-grow">
             <h1 className="text-3xl font-semibold mb-4 text-red-700">{restaurant.name}</h1> {/* Red text */}
@@ -174,8 +173,6 @@ const RestaurantDetailPage = () => {
           </button>
         </div>
           </div>
-          
-          {/* Social Icons - Now inside the restaurant card */}
           <div className="flex-shrink-0 ml-4">
             <div className="card">
               <ul className="flex flex-col py-5 gap-5">
@@ -224,22 +221,20 @@ const RestaurantDetailPage = () => {
        
       </div>
 
-      {/* Menu and Filter Button */}
-      <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6"> {/* Adjusted width */}
-        <h2 className="text-2xl font-semibold text-red-700">Menu</h2> {/* Red text */}
+      <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
         <div className="relative inline-block">
           <button
             ref={filterButtonRef}
             onClick={toggleFilterDropdown}
-            className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-3 rounded focus:outline-none focus:ring focus:ring-red-200 transition duration-300 ease-in-out flex items-center hover:scale-105 border-2 border-red-500" // Thicker button border
+            className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-3 rounded focus:outline-none focus:ring focus:ring-red-200 transition duration-300 ease-in-out flex items-center hover:scale-105 border-2 border-red-500"
           >
-            <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2 text-white" aria-hidden="true" /> {/* White icon */}
-            Filter
+            <AdjustmentsHorizontalIcon className="h-5 w-5 mr-2 text-white" aria-hidden="true" />Filter
           </button>
           {isFilterOpen && (
             <div
               ref={filterDropdownRef}
-              className="absolute right-0 mt-2 w-52 bg-red-100 rounded-md shadow-lg z-10 overflow-hidden transition-all duration-300 ease-in-out transform origin-top-right scale-95 opacity-0 border-2 border-red-500" // Thicker dropdown border
+              className="absolute right-0 mt-2 w-52 bg-red-100 rounded-md shadow-lg z-10 overflow-hidden transition-all duration-300 ease-in-out transform origin-top-right scale-95 opacity-0 border-2 border-red-500"
               style={{
                 transformOrigin: 'top right',
                 transform: isFilterOpen ? 'scale(1)' : 'scale(0.95)',
@@ -250,7 +245,7 @@ const RestaurantDetailPage = () => {
               {allergens.map((allergen) => (
                 <label
                   key={allergen}
-                  className="block px-4 py-3 text-lg text-gray-800 hover:bg-red-200 cursor-pointer hover:scale-105 transition duration-150 ease-in-out border-b border-red-300 last:border-b-0" // Slightly thicker divider
+                  className="block px-4 py-3 text-lg text-gray-800 hover:bg-red-200 cursor-pointer hover:scale-105 transition duration-150 ease-in-out border-b border-red-300 last:border-b-0"
                 >
                   <input
                     type="checkbox"
@@ -272,7 +267,7 @@ const RestaurantDetailPage = () => {
               {selectedAllergens.length > 0 && (
                 <button
                   onClick={() => setSelectedAllergens([])}
-                  className="block w-full px-4 py-3 text-sm text-red-500 hover:bg-red-200 text-left cursor-pointer transition duration-150 ease-in-out hover:scale-105 border-t border-red-300" // Slightly thicker divider
+                  className="block w-full px-4 py-3 text-sm text-red-500 hover:bg-red-200 text-left cursor-pointer transition duration-150 ease-in-out hover:scale-105 border-t border-red-300"
                 >
                   Clear
                 </button>
@@ -282,16 +277,15 @@ const RestaurantDetailPage = () => {
         </div>
       </div>
 
-      {/* Display Menu Items - Border on Hover */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2"> {/* Adjusted width */}
+      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2">
         {filteredMenuItems && filteredMenuItems.map((item) => (
           <div
             key={item._id}
-            className="bg-white rounded-lg overflow-hidden hover:scale-105 transition duration-200 ease-in-out hover:border-4 hover:border-red-300" // Border on hover
+            className="bg-white rounded-lg overflow-hidden hover:scale-105 transition duration-200 ease-in-out hover:border-4 hover:border-red-300"
           >
-            <img src="/img/menu.png" alt={item.name} className="rounded-t-lg w-full object-cover h-32" /> {/* Menu Item Image */}
+            <img src="/img/menu.png" alt={item.name} className="rounded-t-lg w-full object-cover h-32" />
             <div className="p-6">
-              <h3 className="font-semibold text-xl text-red-700 mb-2">{item.name}</h3> {/* Red text */}
+              <h3 className="font-semibold text-xl text-red-700 mb-2">{item.name}</h3>
               <p className="text-gray-700 text-base mb-3">{item.description}</p>
               <div className="flex justify-between items-center">
                 <p className="text-green-600 font-bold text-lg">฿{item.price.toFixed(2)}</p>

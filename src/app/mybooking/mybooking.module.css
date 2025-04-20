@@ -14,7 +14,7 @@
   }
   
   .inner {
-    background-image: linear-gradient(to left, #00cdac, #00c2c9, #00b4e3, #00a2f1, #008cef, #0088eb, #0085e6, #0081e2, #0090de, #009bd2, #00a3c1, #02aab0);
+    background-image: linear-gradient(to left, #FFB19B, #FFA78E, #FF9E83, #FF9679, #FF8E6F, #FF8564, #FF7F5C, #FF7751, #FF7F5C, #FF8564, #FF8E6F, #FF9E83);
     height: 100%;
     transform-origin: left;
     animation: progress 2s infinite;
