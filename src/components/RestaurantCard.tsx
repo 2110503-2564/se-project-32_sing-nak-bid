@@ -3,9 +3,11 @@ import { RestaurantJson } from "../../interfaces";
 export default function RestaurantCard({
   restaurantname,
   imgSrc,
+  restaurantaddress
 }: {
   restaurantname: string;
   imgSrc: string;
+  restaurantaddress: string;
 }) {
   return (
    
@@ -16,7 +18,7 @@ export default function RestaurantCard({
    
    {/* Background image */}
    <div
-        className="absolute top-0 left-0 h-full w-full bg-cover bg-center opacity-60 z-[1]"
+        className="absolute top-0 left-0 h-full w-full bg-cover bg-center opacity-65 z-[1]"
         style={{ backgroundImage: `url(${imgSrc})` }}
       />
 
@@ -93,24 +95,24 @@ export default function RestaurantCard({
     </div>
 
       {/* Tags */}
-    {/* <div className="flex justify-center items-center h-fit w-fit gap-[0.5em]">
+      <div className="flex justify-center items-center h-fit w-fit gap-[0.5em]">
       <div
         className="border-2 border-white rounded-[0.5em] text-white font-nunito text-[1em] font-normal px-[0.5em] py-[0.05em] hover:bg-white hover:text-[#222222] duration-300 cursor-pointer"
       >
-        <p>Drama</p>
+        <p>{restaurantaddress}</p>
+      </div>
+      {/* <div
+        className="border-2 border-white rounded-[0.5em] text-white font-nunito text-[1em] font-normal px-[0.5em] py-[0.05em] hover:bg-white hover:text-[#222222] duration-300 cursor-pointer"
+      >
+        <p>Thai Food</p>
       </div>
       <div
         className="border-2 border-white rounded-[0.5em] text-white font-nunito text-[1em] font-normal px-[0.5em] py-[0.05em] hover:bg-white hover:text-[#222222] duration-300 cursor-pointer"
       >
-        <p>Action</p>
-      </div>
-      <div
-        className="border-2 border-white rounded-[0.5em] text-white font-nunito text-[1em] font-normal px-[0.5em] py-[0.05em] hover:bg-white hover:text-[#222222] duration-300 cursor-pointer"
-      >
-        <p>Balls</p>
-      </div>
-    </div>
-  </div> */}
+        <p>Great Service</p>
+      </div> */}
+    </div> 
+  </div> 
 
     {/* Description */}
   <p
@@ -119,6 +121,6 @@ export default function RestaurantCard({
     Description here
   </p>
 </div>
-</div>
+
   );
 }
