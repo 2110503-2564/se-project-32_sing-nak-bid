@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import getRestaurant from '@/libs/getRestaurant'; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid';
-
+import styles from '../../../../components/Button.module.css'
 interface RestaurantDetail {
   _id: string;
   name: string;
@@ -160,6 +160,19 @@ const RestaurantDetailPage = () => {
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Tel:</span> {restaurant.tel}</p> {/* Red accent */}
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Open Time:</span> {restaurant.opentime}</p> {/* Red accent */}
             <p className="text-gray-700"><span className="font-semibold text-red-500">Close Time:</span> {restaurant.closetime}</p> {/* Red accent */}
+            <div className="w-full flex py-4 mb-10">
+          <button
+            className={`group ${styles["button"]}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push("/restaurant");
+            }}
+          >
+            <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+              Book this Restaurant
+            </span>
+          </button>
+        </div>
           </div>
           
           {/* Social Icons - Now inside the restaurant card */}
@@ -208,6 +221,7 @@ const RestaurantDetailPage = () => {
             </div>
           </div>
         </div>
+       
       </div>
 
       {/* Menu and Filter Button */}
