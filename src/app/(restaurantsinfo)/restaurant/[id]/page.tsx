@@ -3,7 +3,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import getRestaurant from '@/libs/getRestaurant'; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid';
-
+import styles from '../../../../components/Button.module.css'
 interface RestaurantDetail {
   _id: string;
   name: string;
@@ -151,14 +151,27 @@ const RestaurantDetailPage = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8"> {/* Removed -my-3 and added py-8 */}
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
-        <img src="/img/Jeh-O.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" />
+        <img src="/img/food3.jpg" alt={restaurant.name} className="rounded-md mb-4 w-full object-cover h-48" />
         <div className="flex justify-between items-start">
           <div className="flex-grow">
-            <h1 className="text-3xl font-semibold mb-4 text-red-700">{restaurant.name}</h1>
-            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Address:</span> {restaurant.address}</p>
-            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Tel:</span> {restaurant.tel}</p>
-            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Open Time:</span> {restaurant.opentime}</p>
-            <p className="text-gray-700"><span className="font-semibold text-red-500">Close Time:</span> {restaurant.closetime}</p>
+            <h1 className="text-3xl font-semibold mb-4 text-red-700">{restaurant.name}</h1> {/* Red text */}
+            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Address:</span> {restaurant.address}</p> {/* Red accent */}
+            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Tel:</span> {restaurant.tel}</p> {/* Red accent */}
+            <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Open Time:</span> {restaurant.opentime}</p> {/* Red accent */}
+            <p className="text-gray-700"><span className="font-semibold text-red-500">Close Time:</span> {restaurant.closetime}</p> {/* Red accent */}
+            <div className="w-full flex py-4 mb-10">
+          <button
+            className={`group ${styles["button"]}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push("/restaurant");
+            }}
+          >
+            <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+              Book this Restaurant
+            </span>
+          </button>
+        </div>
           </div>
           <div className="flex-shrink-0 ml-4">
             <div className="card">
@@ -205,6 +218,7 @@ const RestaurantDetailPage = () => {
             </div>
           </div>
         </div>
+       
       </div>
 
       <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
