@@ -39,7 +39,7 @@ export default function MyOrder() {
       if (!session?.user?.token) return;
       try {
         setLoading(true);
-        const orders: OrderJson = await getOrders(session.user.token,);
+        const orders: OrderJson = await getOrders(session.user.token);
         setOrdersItems(orders.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
