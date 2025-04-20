@@ -15,7 +15,7 @@ export default function ProfileOrder(){
                 </svg>
             </div>
             <p className="mt-5 font-semibold text-xl">{session?.user.name}</p>
-            <span className="block text-base font-light">{session?.user.name}</span>
+            <span className="block text-base font-light">{session?.user.email}</span>
 
             <div className="mt-6 w-full h-[2px] bg-[#AC6643] mb-4"></div>
 

@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import getRestaurant from '@/libs/getRestaurant'; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid';
 import styles from '../../../../components/Button.module.css'
+
+
 interface RestaurantDetail {
   _id: string;
   name: string;
@@ -41,6 +43,9 @@ const RestaurantDetailPage = () => {
   const filterDropdownRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
+
 
   useEffect(() => {
     const fetchRestaurantDetail = async () => {
@@ -148,6 +153,16 @@ const RestaurantDetailPage = () => {
     return <div className="flex justify-center items-center h-screen">Restaurant not found.</div>;
   }
 
+  const handleClick = (menuItem: MenuItem) => {
+    setSelectedMenuItem(menuItem);
+    setShowPopup(true);
+  };
+
+  const handleClose = () => {
+    setShowPopup(false);
+    setSelectedMenuItem(null);
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8"> {/* Removed -my-3 and added py-8 */}
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
@@ -159,19 +174,7 @@ const RestaurantDetailPage = () => {
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Tel:</span> {restaurant.tel}</p> {/* Red accent */}
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Open Time:</span> {restaurant.opentime}</p> {/* Red accent */}
             <p className="text-gray-700"><span className="font-semibold text-red-500">Close Time:</span> {restaurant.closetime}</p> {/* Red accent */}
-            <div className="w-full flex py-4 mb-10">
-          <button
-            className={`group ${styles["button"]}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              router.push("/restaurant");
-            }}
-          >
-            <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-              Book this Restaurant
-            </span>
-          </button>
-        </div>
+           
           </div>
           <div className="flex-shrink-0 ml-4">
             <div className="card">
@@ -217,8 +220,7 @@ const RestaurantDetailPage = () => {
               </ul>
             </div>
           </div>
-        </div>
-       
+        </div>      
       </div>
 
       <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
@@ -279,11 +281,16 @@ const RestaurantDetailPage = () => {
 
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2">
         {filteredMenuItems && filteredMenuItems.map((item) => (
+      
           <div
             key={item._id}
             className="bg-white rounded-lg overflow-hidden hover:scale-105 transition duration-200 ease-in-out hover:border-4 hover:border-red-300"
           >
-            <img src="/img/menu.png" alt={item.name} className="rounded-t-lg w-full object-cover h-32" />
+          
+          <div className="relative">
+
+           <img src="/img/menu.png" alt={item.name} className="rounded-t-lg w-full object-cover h-32" />         
+            </div>
             <div className="p-6">
               <h3 className="font-semibold text-xl text-red-700 mb-2">{item.name}</h3>
               <p className="text-gray-700 text-base mb-3">{item.description}</p>
@@ -301,16 +308,78 @@ const RestaurantDetailPage = () => {
                         return '';
                       }
                     }).join(', ')}
+                    
                   </div>
                 )}
-              </div>
             </div>
+            <div className="w-full flex justify-center mt-4"> 
+            <button
+                  className={`group ${styles["button"]}`}
+                  onClick={() => handleClick(item)}
+                >
+                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                    Add menu to your order
+                  </span>
+                </button>
+              </div>
           </div>
+         </div>
         ))}
         {filteredMenuItems && filteredMenuItems.length === 0 && (
           <p className="text-gray-500">No menu items found {selectedAllergens.length > 0 ? 'matching your filter.' : '.'}</p>
         )}
       </div>
+      
+        {/* Popup overlay based on the example image */}
+      {showPopup && selectedMenuItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+          <div className="bg-[#F4ECDD] rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden">
+            {/* Header with Menu Picture */}
+            <div className="bg-[#F4ECDD]  flex">
+            <img 
+    src='/img/menu.png' />
+              <div className="text-center">
+                
+                <div className=" w-24 h-24 mx-auto flex items-center justify-center rounded ">
+                
+                </div>
+              </div>
+            </div>
+            
+            {/* Description */}
+            <div className="bg-gray-50 p-4 mt-4 mx-4 rounded ">
+              <h1 className="text-center text-[#201335] text-xl font-bold "> {selectedMenuItem.name}</h1>
+              <p className="text-center text-gray-600">{selectedMenuItem.description}</p>
+            </div>
+            
+            {/* Input Field */}
+            <div className="p-4">
+              <input 
+                type="text" 
+                placeholder="Enter..." 
+                className="w-full p-2 border border-gray-300 rounded"
+              />
+            </div>
+            
+            {/* Quantity Controls and Confirm Button */}
+            <div className="p-4 flex justify-between items-center bg-[#F4ECDD]">
+              <div className="flex items-center space-x-4">
+                <button className="text-2xl font-bold text-gray-600">-</button>
+                <span className="text-lg">1</span>
+                <button className="text-2xl font-bold text-gray-600">+</button>
+              </div>
+              
+              <button 
+                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200"
+                onClick={handleClose}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
