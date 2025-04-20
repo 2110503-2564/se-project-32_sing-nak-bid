@@ -36,7 +36,7 @@ export default function UserPage() {
             className={`group ${styles["button"]}`}
             onClick={(e) => {
               e.stopPropagation();
-              router.push("/hotels");
+              router.push("/restaurant");
             }}
           >
             <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
