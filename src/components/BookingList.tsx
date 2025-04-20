@@ -4,19 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReservationsItem, ReservationJson } from "../../interfaces";
 import getReserves from "@/libs/getReserves";
-import deleteReserve from "@/libs/deleteReserve"; 
+import deleteReserve from "@/libs/deleteReserve";
+import styles from "../app/mybooking/mybooking.module.css";
 
-export default function BookingList() {
+export default function ReservationList() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [reservationsItems, setReservationsItems] = useState<ReservationsItem[]>([]);
+  const [reservationsItems, setReservationsItems] = useState<
+    ReservationsItem[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
-  const handleRemoveBooking = async (id: string) => {
+  const handleRemoveReservation = async (id: string) => {
     if (!session?.user?.token) return;
 
     const isConfirmed = window.confirm(
-      "Are you sure you want to remove this booking?"
+      "Are you sure you want to remove this Reservation?"
     );
     if (!isConfirmed) return;
 
@@ -29,26 +32,35 @@ export default function BookingList() {
   };
 
   useEffect(() => {
-    const fetchBookings = async () => {
+    const fetchReservations = async () => {
       if (!session?.user?.token) return;
       try {
         setLoading(true);
-        const reservations: ReservationJson = await getReserves(session.user.token);
+        const reservations: ReservationJson = await getReserves(
+          session.user.token
+        );
         setReservationsItems(reservations.data);
       } catch (error) {
         console.error("Failed to fetch reservations:", error);
       } finally {
+        new Promise((res) => setTimeout(res, 1000));
         setLoading(false);
       }
     };
 
     if (session?.user?.token) {
-      fetchBookings();
+      fetchReservations();
     }
   }, [session?.user?.token]);
 
   if (status === "loading" || loading) {
-    return <div>Loading bookings...</div>;
+    return (
+      <div className={styles.container}>
+        <div className={styles.progress}>
+          <div className={styles.inner}></div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -64,15 +76,12 @@ export default function BookingList() {
               <span className="font-medium">Reservation Date:</span>{" "}
               {reservationsItem.reservationDate}
             </div>
-            {/* <div className="text-lg text-gray-600 mb-4">
-              <span className="font-medium">Nights:</span> {reservationsItem.}
-            </div> */}
             <div className="flex space-x-2">
               <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-red-500 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-red-300 hover:text-black"
-                onClick={() => handleRemoveBooking(reservationsItem._id)}
+                className="relative inline-block w-60 h-12 text-[17px] font-medium border-2 border-black bg-red-500 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-red-300 hover:text-black"
+                onClick={() => handleRemoveReservation(reservationsItem._id)}
               >
-                <span className="relative z-10">Remove Booking</span>
+                <span className="relative z-10">Remove Reservation</span>
               </button>
 
               <button
@@ -93,7 +102,7 @@ export default function BookingList() {
         ))
       ) : (
         <div className="text-xl text-center text-gray-600">
-          No Hotel Booking Available.
+          No Restaurant Reservation Available.
         </div>
       )}
     </div>

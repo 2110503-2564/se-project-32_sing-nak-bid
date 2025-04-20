@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { addBooking as reduxBooking } from "@/redux/features/bookSlice";
-import { BookingItem } from "../../../interfaces";
+import { ReservationsItem } from "../../../interfaces";
 import ErrorAlert from "@/components/ErrorAlert";
 import SuccessAlert from "@/components/SuccessAlert";
 import { useSession } from "next-auth/react";

@@ -4,18 +4,18 @@ import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import updateReserve from "@/libs/updateReserve";
 
-export default function UpdateBookingPage() {
+export default function UpdateReservationPage() {
   const { id } = useParams() as { id: string };
   const { data: session } = useSession();
   const router = useRouter();
 
-  const [bookingDate, setBookingDate] = useState("");
+  const [reservationDate, setReservationDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const handleUpdate = async () => {
-    if (!session?.user?.token || !bookingDate) {
-      setMessage("Please select a booking date.");
+    if (!session?.user?.token || !reservationDate) {
+      setMessage("Please select a reservation date.");
       return;
     }
 
@@ -23,12 +23,12 @@ export default function UpdateBookingPage() {
     setMessage("");
 
     try {
-      await updateReserve(id, bookingDate, session.user.token);
-      setMessage("Booking updated successfully!");
+      await updateReserve(id, reservationDate, session.user.token);
+      setMessage("Reservation updated successfully!");
       setTimeout(() => router.push("/"), 1500);
     } catch (error) {
-      console.error("Failed to update booking:", error);
-      setMessage("Failed to update booking.");
+      console.error("Failed to update reservation:", error);
+      setMessage("Failed to update reservation.");
     } finally {
       setLoading(false);
     }
@@ -36,15 +36,14 @@ export default function UpdateBookingPage() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Update Booking</h1>
-
+      <h1 className="text-2xl font-bold mb-4">Update Reservation</h1>
       <label className="block mb-2 text-lg font-medium">
-        Select New Booking Date
+        Select New Reservation Date
       </label>
       <input
         type="date"
-        value={bookingDate}
-        onChange={(e) => setBookingDate(e.target.value)}
+        value={reservationDate}
+        onChange={(e) => setReservationDate(e.target.value)}
         className="border p-2 rounded w-full mb-4 bg-white text-black focus:ring-2 focus:ring-blue-400"
       />
 
