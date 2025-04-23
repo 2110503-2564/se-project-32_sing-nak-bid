@@ -174,7 +174,19 @@ const RestaurantDetailPage = () => {
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Tel:</span> {restaurant.tel}</p> {/* Red accent */}
             <p className="text-gray-700 mb-2"><span className="font-semibold text-red-500">Open Time:</span> {restaurant.opentime}</p> {/* Red accent */}
             <p className="text-gray-700"><span className="font-semibold text-red-500">Close Time:</span> {restaurant.closetime}</p> {/* Red accent */}
-           
+            <div className="w-full flex  mt-4"> 
+            <button
+                  className={`group ${styles["button"]}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push("/reserve");
+                  }}
+                >
+                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                    Reserve this Restaurant
+                  </span>
+                </button>
+              </div>
           </div>
           <div className="flex-shrink-0 ml-4">
             <div className="card">
@@ -312,7 +324,8 @@ const RestaurantDetailPage = () => {
                   </div>
                 )}
             </div>
-            <div className="w-full flex justify-center mt-4"> 
+          {/* เอาปุ่มออกเพราะไม่จำเป็นต้องมีปุ่มตรงเมนู */}
+            {/* <div className="w-full flex justify-center mt-4"> 
             <button
                   className={`group ${styles["button"]}`}
                   onClick={() => handleClick(item)}
@@ -321,7 +334,7 @@ const RestaurantDetailPage = () => {
                     Add menu to your order
                   </span>
                 </button>
-              </div>
+              </div> */}
           </div>
          </div>
         ))}
