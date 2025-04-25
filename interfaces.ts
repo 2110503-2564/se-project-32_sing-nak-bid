@@ -73,6 +73,9 @@ export interface OrderItem {
 
 export interface OrdersItem {
   _id: string;
+  restaurant: Restaurant;
+  checkInTime: Date;
+  checkInStatus: boolean;
   reservation: ReservationsItem;
   orderItems: OrderItem[];
   totalPrice: number;

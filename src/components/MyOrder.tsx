@@ -11,6 +11,7 @@ import {
 import getOrders from "@/libs/getOrders";
 import getOrder from "@/libs/getOrder";
 import deleteOrder from "@/libs/deleteOrder";
+import { useRouter } from "next/navigation";
 
 {
   /* <div class="w-[250px] bg-white rounded-[10px] border border-silver p-[10px] m-[5px]">
@@ -22,7 +23,7 @@ export default function MyOrder() {
   const { data: session, status } = useSession();
   const [ordersItems, setOrdersItems] = useState<OrdersItem[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
   useEffect(() => {
     const fetchOrders = async () => {
       if (!session?.user?.token) return;
@@ -124,37 +125,31 @@ export default function MyOrder() {
               color: "#201335",
             }}
           >
-            {ordersItem.orderItems.map((item) => (
-              <div>
-                <div key={item._id} className="mb-4 bg-white/40 p-3 rounded-md">
+            
+              
+                <div key={ordersItem._id} className="mb-4 bg-white/40 p-3 rounded-md">
                   <div className="text-lg mb-1">
-                    <span className="font-semibold">Menu:</span>{" "}
-                    {item.menuItem.name}
+                    <span className="font-semibold">Restaurant:</span>{" "}
+                    {ordersItem.restaurant.name}
                   </div>
 
                   <div className="text-lg mb-1">
-                    <span className="font-semibold">Quantity:</span>{" "}
-                    {item.quantity}
+                    <span className="font-semibold">Check-in Date & Time:</span>{" "}
+                    {ordersItem.checkInTime ? new Date(ordersItem.checkInTime).toLocaleString() : "-"}
                   </div>
                   <div className="text-lg mb-1">
-                    <span className="font-semibold">Note:</span>{" "}
-                    {item.note || "-"}
+                    <span className="font-semibold">Check-in Status:</span>{" "}
+                    {ordersItem.checkInStatus?"Checked-in":"Not Check-in yet"}
                   </div>
                   <div className="text-lg mb-1">
                     <span className="font-semibold">
-                      Price: {item.menuItem.price}
+                      Order Status: {ordersItem.status}
                     </span>{" "}
-                    ฿
-                  </div>
-                  <div className="text-lg mb-1">
-                    <span className="font-semibold">Description:</span>
-                    {item.menuItem.description}
-                  </div>
-                </div>
                 
-              </div>
-            
-            ))}
+                  </div>
+                  
+                </div>
+
 
                   <div className="flex space-x-2 mt-4">
                     <button
@@ -170,7 +165,23 @@ export default function MyOrder() {
                     >
                       <span className="relative z-10">Remove Orders</span>
                     </button>
+
+                    <button
+                      className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-500"
+                      style={{
+                        backgroundColor: "#AC6643",
+                        borderColor: "#201335",
+                        color: "#f4ecdd",
+                      }}
+                      onClick={() => router.push(`/myorder/${ordersItem._id}`)}
+                    >
+                      <span className="relative z-10">View Details</span>
+                    </button>
                   </div>
+
+                  
+                    
+                  
           </div>
         ))
       ) : (
