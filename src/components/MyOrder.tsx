@@ -151,36 +151,24 @@ export default function MyOrder() {
                 </div>
 
 
-                  <div className="flex space-x-2 mt-4">
-                    <button
-                      className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-500"
-                      style={{
-                        backgroundColor: "#AC6643",
-                        borderColor: "#201335",
-                        color: "#f4ecdd",
-                      }}
-                      onClick={() => {
-                        handleRemoveOrder(ordersItem._id);
-                      }}
-                    >
-                      <span className="relative z-10">Remove Orders</span>
-                    </button>
+                <div className="flex space-x-2 mt-4">
+  <button
+    className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-300 bg-[#AC6643] border-[#201335] text-[#f4ecdd] hover:bg-[#8a4f35] hover:text-white"
+    onClick={() => {
+      handleRemoveOrder(ordersItem._id);
+    }}
+  >
+    <span className="relative z-10">Remove Orders</span>
+  </button>
 
-                    <button
-                      className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-500"
-                      style={{
-                        backgroundColor: "#AC6643",
-                        borderColor: "#201335",
-                        color: "#f4ecdd",
-                      }}
-                      onClick={() => router.push(`/myorder/${ordersItem._id}`)}
-                    >
-                      <span className="relative z-10">View Details</span>
-                    </button>
-                  </div>
+  <button
+    className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 rounded-md overflow-hidden transition-colors duration-300 bg-[#AC6643] border-[#201335] text-[#f4ecdd] hover:bg-[#8a4f35] hover:text-white"
+    onClick={() => router.push(`/myorder/${ordersItem._id}`)}
+  >
+    <span className="relative z-10">View Details</span>
+  </button>
+</div>
 
-                  
-                    
                   
           </div>
         ))

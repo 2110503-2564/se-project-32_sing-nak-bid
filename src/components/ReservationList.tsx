@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ReservationsItem, ReservationJson } from "../../interfaces";
+import { Restaurant } from "../../interfaces";
 import getReserves from "@/libs/getReserves";
 import deleteReserve from "@/libs/deleteReserve";
 import styles from "../app/myreservation/myreservation.module.css"
@@ -86,18 +87,25 @@ export default function ReservationList() {
               </button>
 
               <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
+                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-green-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-green-300 hover:text-black"
                 onClick={() => router.push(`/update/${reservationsItem._id}`)}
               >
                 Update
               </button>
-
               <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
+                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-yellow-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-yellow-300 hover:text-black"
                 onClick={() => router.push(`/order/${reservationsItem._id}`)}
               >
                 Order
               </button>
+
+              <button
+                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
+                onClick={() => router.push(`/myorder`)}
+              >
+                My Order
+              </button>
+
             </div>
           </div>
         ))
