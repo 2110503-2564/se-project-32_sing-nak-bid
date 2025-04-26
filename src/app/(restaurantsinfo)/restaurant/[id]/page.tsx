@@ -245,6 +245,19 @@ const RestaurantDetailPage = () => {
                   Reserve this Restaurant
                 </span>
               </button>
+
+              {/* Review Button */}
+              <button
+                className={`group ${styles["button"]}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/review/${restaurant._id}`);
+                }}
+              >
+                <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                  Write a review
+                </span>
+              </button>
             </div>
           </div>
           <div className="flex-shrink-0 ml-4">
