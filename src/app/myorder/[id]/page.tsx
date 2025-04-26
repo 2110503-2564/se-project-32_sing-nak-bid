@@ -95,7 +95,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300"
             >
               <img
-          src="/img/food3.jpg"
+          src="/img/food1.jpg"
           className="rounded-md mb-4 w-full object-cover h-48"
         />
               <div className="p-5">
