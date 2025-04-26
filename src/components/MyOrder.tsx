@@ -66,6 +66,13 @@ export default function MyOrder() {
       console.error("Failed to delete Order:", error);
     }
   };
+  // ordersItems.map((ordersItem, index) => (
+    
+  //   useEffect(() => {
+  //     console.log(index," Check-in Time:", ordersItem.checkInTime);
+  //   }, [ordersItem])
+
+  // ))
 
   //Loading
   if (status === "loading" || loading) {
@@ -137,11 +144,11 @@ export default function MyOrder() {
 
    <div className="text-lg mb-1">
     <span className="font-semibold">Check-in Date & Time:</span>{" "}
-    {ordersItem.checkInTime ? new Date(ordersItem.checkInTime).toLocaleString() : "-"}
+    {ordersItem.checkInTime ? ordersItem.checkInTime.toLocaleString() : "No check in yet"}
    </div>
    <div className="text-lg mb-1">
     <span className="font-semibold">Check-in Status:</span>{" "}
-    {ordersItem.checkInStatus?"Checked-in":"Not Check-in yet"}
+    {ordersItem.checkInStatus?"Checked-in":"No check in yet"}
    </div>
    <div className="text-lg mb-1">
     <span className="font-semibold">

@@ -22,6 +22,7 @@ export default function ReserveRestaurant() {
   const [selectedRestaurantId, setSelectedRestaurantId] = useState<string>("");
   const [reserveDate, setReserveDate] = useState<Dayjs | null>(null);
   const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showErrorDayAlert, setShowErrorDayAlert] = useState(false);
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   // Fetch restaurants using the helper function
@@ -48,6 +49,14 @@ export default function ReserveRestaurant() {
       setShowErrorAlert(true);
       return;
     }
+
+    const today = dayjs().startOf('day');
+    const selectedDate = dayjs(reserveDate).startOf('day');
+
+    if(selectedDate.isBefore(today)){
+      setShowErrorDayAlert(true);
+      return;
+  }
   
     const reservationItem = {
       reservationDateTime: dayjs(reserveDate).toISOString(),
@@ -93,6 +102,12 @@ export default function ReserveRestaurant() {
         <SuccessAlert
           message="Reservation successfully completed!"
           onClose={() => setShowSuccessAlert(false)}
+        />
+      )}
+      {showErrorDayAlert && (
+        <ErrorAlert
+          message="Please select a future date."
+          onClose={() => setShowErrorDayAlert(false)}
         />
       )}
 
