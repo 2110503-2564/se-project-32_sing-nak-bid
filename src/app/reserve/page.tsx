@@ -37,30 +37,37 @@ export default function ReserveRestaurant() {
     };
     fetchRestaurants();
   }, []);
-  
+
 
   const makeReservation = async () => {
     console.log("Session Token:", session?.user?.token);
     console.log("Selected Restaurant ID:", selectedRestaurantId);
     console.log("Reserve Date:", reserveDate);
-  
+
     if (!session?.user?.token || !selectedRestaurantId || !reserveDate) {
       setShowErrorAlert(true);
       return;
     }
-  
+
+    // Check if the selected date is in the past
+    const tomorrow = dayjs().add(1, 'day').startOf('day');
+    if (reserveDate.isBefore(tomorrow)) {
+      setShowErrorAlert(true);
+      return;
+    }
+
     const reservationItem = {
       reservationDateTime: dayjs(reserveDate).toISOString(),
       restaurant: selectedRestaurantId,
     };
-  
+
     const success = await addReserve(
       reservationItem.reservationDateTime,
       "pending",
       selectedRestaurantId,
       session.user.token
     );
-  
+
     if (success) {
       dispatch(
         reduxBooking({
@@ -79,13 +86,13 @@ export default function ReserveRestaurant() {
       setShowSuccessAlert(false);
     }
   };
-  
+
 
   return (
     <main className="w-full flex flex-col items-center justify-center min-h-screen bg-[#F4ECDD] px-4">
       {showErrorAlert && (
         <ErrorAlert
-          message="Please fill out all fields"
+          message="Please fill out all fields or select a date from tomorrow onwards."
           onClose={() => setShowErrorAlert(false)}
         />
       )}
