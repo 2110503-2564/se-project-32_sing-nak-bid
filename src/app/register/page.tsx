@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RegisterForm from '@/libs/register';
 
 function SignUp() {
@@ -9,26 +9,46 @@ function SignUp() {
     const [password, setPassword] = useState('');
     const [telephone, setTelephone] = useState('');
     const [message, setMessage] = useState<string | null>(null);
+    const [passwordErrors, setPasswordErrors] = useState<{ message: string; isValid: boolean }[]>([
+        { message: 'รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร', isValid: false },
+        { message: 'รหัสผ่านต้องมีตัวพิมพ์เล็กอย่างน้อย 1 ตัว', isValid: false },
+        { message: 'รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว', isValid: false },
+        { message: 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว', isValid: false },
+    ]);
+
+    useEffect(() => {
+        const errors = [...passwordErrors];
+        errors[0].isValid = password.length >= 8;
+        errors[1].isValid = /[a-z]/.test(password);
+        errors[2].isValid = /[A-Z]/.test(password);
+        errors[3].isValid = /[0-9]/.test(password);
+        setPasswordErrors(errors);
+    }, [password]);
 
     const handleRegister = async () => {
+        const hasErrors = passwordErrors.some((error) => !error.isValid);
+        if (hasErrors) {
+            setMessage('โปรดแก้ไขข้อผิดพลาดของรหัสผ่านก่อนทำการสมัคร');
+            return;
+        }
         try {
             const result = await RegisterForm(name, telephone, email, password);
-            setMessage("Registration successful!");
-            console.log("Registration successful:", result);
+            setMessage("สมัครสมาชิกสำเร็จ!");
+            console.log("สมัครสมาชิกสำเร็จ:", result);
         } catch (error) {
-            setMessage(`Registration failed: ${(error as Error).message}`);
-            console.error("Registration error:", error);
+            setMessage(`สมัครสมาิกล้มเหลว: ${(error as Error).message}`);
+            console.error("ข้อผิดพลาดในการสมัครสมาชิก:", error);
         }
     };
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-100">
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
-                <h2 className="text-2xl font-bold mb-4 text-center">Sign Up</h2>
+                <h2 className="text-2xl font-bold mb-4 text-center">สมัครสมาชิก</h2>
                 {message && (
                     <p
                         className={`text-sm text-center mb-4 ${
-                            message.startsWith('Registration failed') ? 'text-red-500' : 'text-green-500'
+                            message.startsWith('สมัครสมาิกล้มเหลว') ? 'text-red-500' : 'text-green-500'
                         }`}
                     >
                         {message}
@@ -36,40 +56,47 @@ function SignUp() {
                 )}
                 <form className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium">Full Name</label>
+                        <label className="block text-sm font-medium">ชื่อเต็ม</label>
                         <input
                             type="text"
-                            placeholder="Enter your full name"
+                            placeholder="กรุณากรอกชื่อเต็มของคุณ"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Email Address</label>
+                        <label className="block text-sm font-medium">อีเมล</label>
                         <input
                             type="email"
-                            placeholder="Enter your email"
+                            placeholder="กรุณากรอกอีเมลของคุณ"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Password</label>
+                        <label className="block text-sm font-medium">รหัสผ่าน</label>
                         <input
                             type="password"
-                            placeholder="Enter your password"
+                            placeholder="กรุณากรอกรหัสผ่านของคุณ"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        <div className="mt-2 text-sm">
+                            {passwordErrors.map((error, index) => (
+                                <p key={index} className={error.isValid ? 'text-green-500' : 'text-red-500'}>
+                                    {error.message}
+                                </p>
+                            ))}
+                        </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium">Phone Number</label>
+                        <label className="block text-sm font-medium">เบอร์โทรศัพท์</label>
                         <input
                             type="tel"
-                            placeholder="Enter your phone number"
+                            placeholder="กรุณากรอกเบอร์โทรศัพท์ของคุณ"
                             value={telephone}
                             onChange={(e) => setTelephone(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -80,8 +107,8 @@ function SignUp() {
                         onClick={handleRegister}
                         className="relative inline-block w-full h-12 text-[17px] font-medium border-2 border-black bg-gray-800 text-white rounded-md overflow-hidden transition-colors duration-500 hover:bg-white hover:text-black"
                     >
-                         <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span>
-                         <span className="relative z-10">Register</span>  
+                        <span className="absolute top-full left-full w-[200px] h-[150px] bg-white rounded-full transition-all duration-700 hover:top-[-30px] hover:left-[-30px]"></span>
+                        <span className="relative z-10">สมัครสมาชิก</span>
                     </button>
                 </form>
             </div>
