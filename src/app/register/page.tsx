@@ -15,6 +15,7 @@ function SignUp() {
         { message: 'รหัสผ่านต้องมีตัวพิมพ์ใหญ่อย่างน้อย 1 ตัว', isValid: false },
         { message: 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว', isValid: false },
     ]);
+    const [telephoneError, setTelephoneError] = useState<string | null>(null);
 
     useEffect(() => {
         const errors = [...passwordErrors];
@@ -23,12 +24,18 @@ function SignUp() {
         errors[2].isValid = /[A-Z]/.test(password);
         errors[3].isValid = /[0-9]/.test(password);
         setPasswordErrors(errors);
-    }, [password]);
+
+        if (telephone.length > 0 && (!/^\d+$/.test(telephone) || telephone.length !== 10)) {
+            setTelephoneError('หมายเลขโทรศัพท์ต้องเป็นตัวเลข 10 ตัวเท่านั้น');
+        } else {
+            setTelephoneError(null);
+        }
+    }, [password, telephone]);
 
     const handleRegister = async () => {
-        const hasErrors = passwordErrors.some((error) => !error.isValid);
-        if (hasErrors) {
-            setMessage('โปรดแก้ไขข้อผิดพลาดของรหัสผ่านก่อนทำการสมัคร');
+        const hasPasswordErrors = passwordErrors.some((error) => !error.isValid);
+        if (hasPasswordErrors || telephoneError) {
+            setMessage('โปรดแก้ไขข้อผิดพลาดของรหัสผ่านและหมายเลขโทรศัพท์ก่อนทำการสมัคร');
             return;
         }
         try {
@@ -101,6 +108,9 @@ function SignUp() {
                             onChange={(e) => setTelephone(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {telephoneError && (
+                            <p className="mt-2 text-red-500 text-sm">{telephoneError}</p>
+                        )}
                     </div>
                     <button
                         type="button"
