@@ -4,10 +4,11 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useRef } from 'react';
 import getRestaurant from '@/libs/getRestaurant'; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid';
-import styles from '../../../components/Button.module.css';
+import styles from '../../../../components/Button.module.css';
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 import addOrder from '@/libs/addOrder';
 import { useSession } from 'next-auth/react';
+import getUserProfile from '@/libs/getUserProfile';
 
 // Import OrderItem interface (สมมติว่าอยู่ในไฟล์นี้)
 interface OrderItem {
@@ -45,10 +46,11 @@ interface CartItem extends MenuItem {
   note?: string; // เปลี่ยนจาก specialRequests เป็น note
 }
 
+
 const OrdersMenuPage = () => {
   const router = useRouter();
   const params = useParams();
-  const { id: restaurantId, reservationId } = params as { id: string; reservationId: string };
+  const { restaurantId, reservationId } = params;
   const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -251,7 +253,8 @@ const OrdersMenuPage = () => {
     }
 
     // สมมติว่าคุณมีวิธีจัดการ token อยู่แล้ว
-    const token = session?.user.token; // Replace with your actual token retrieval method
+    if(!session?.user?.token) return
+    const token = session.user.token; // Replace with your actual token retrieval method
 
     const orderItemsToSend = cartItems.map(cartItem => ({
       menuItem: cartItem._id, // ส่ง _id ของ MenuItem โดยตรง
@@ -261,10 +264,14 @@ const OrdersMenuPage = () => {
 
     const totalPrice = calculateTotal();
 
+    const userProfile = await getUserProfile(token);
+    const phoneNumberFromProfile = userProfile.data.telnumber;
+
     const orderData = {
       orderItems: orderItemsToSend,
       totalPrice: totalPrice,
       // คุณอาจต้องส่ง status เริ่มต้นด้วย เช่น 'pending'
+      phoneNumber: phoneNumberFromProfile,
       status: 'pending',
     };
 
