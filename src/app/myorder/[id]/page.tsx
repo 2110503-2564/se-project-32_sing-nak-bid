@@ -94,6 +94,10 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               key={item._id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300"
             >
+              <img
+          src="/img/food3.jpg"
+          className="rounded-md mb-4 w-full object-cover h-48"
+        />
               <div className="p-5">
                 <h3 className="font-bold text-lg text-gray-800 mb-2">{item.menuItem.name}</h3>
                 <p className="text-green-600 font-medium mb-3">{item.menuItem.price} THB</p>
