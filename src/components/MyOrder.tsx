@@ -120,7 +120,7 @@ export default function MyOrder() {
             key={index}
             className="w-full rounded-[10px] border p-6 shadow"
             style={{
-              backgroundColor: "#ED8265",
+              backgroundColor: "#DEB887",
               borderColor: "#AC6643",
               color: "#201335",
             }}
