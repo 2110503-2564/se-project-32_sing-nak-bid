@@ -16,6 +16,7 @@ function SignUp() {
         { message: 'รหัสผ่านต้องมีตัวเลขอย่างน้อย 1 ตัว', isValid: false },
     ]);
     const [telephoneError, setTelephoneError] = useState<string | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
 
     useEffect(() => {
         const errors = [...passwordErrors];
@@ -30,12 +31,18 @@ function SignUp() {
         } else {
             setTelephoneError(null);
         }
-    }, [password, telephone]);
+
+        if (email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            setEmailError('รูปแบบอีเมลไม่ถูกต้อง');
+        } else {
+            setEmailError(null);
+        }
+    }, [password, telephone, email]);
 
     const handleRegister = async () => {
         const hasPasswordErrors = passwordErrors.some((error) => !error.isValid);
-        if (hasPasswordErrors || telephoneError) {
-            setMessage('โปรดแก้ไขข้อผิดพลาดของรหัสผ่านและหมายเลขโทรศัพท์ก่อนทำการสมัคร');
+        if (hasPasswordErrors || telephoneError || emailError) {
+            setMessage('โปรดแก้ไขข้อผิดพลาดของรหัสผ่าน, หมายเลขโทรศัพท์ และอีเมลก่อนทำการสมัคร');
             return;
         }
         try {
@@ -81,6 +88,9 @@ function SignUp() {
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
+                        {emailError && (
+                            <p className="mt-2 text-red-500 text-sm">{emailError}</p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium">รหัสผ่าน</label>
