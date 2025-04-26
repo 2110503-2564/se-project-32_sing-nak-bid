@@ -127,28 +127,29 @@ export default function MyOrder() {
           >
             
               
-                <div key={ordersItem._id} className="mb-4 bg-white/40 p-3 rounded-md">
-                  <div className="text-lg mb-1">
-                    <span className="font-semibold">Restaurant:</span>{" "}
-                    {ordersItem.restaurant.name}
-                  </div>
+            <div key={ordersItem._id} className="mb-4 bg-white/40 p-3 rounded-md flex items-start">
+  <img src="/img/Food3.jpg" alt="Food" className="w-[30%] h-auto mr-4 rounded border border-gray-300" />
+  <div>
+   <div className="text-lg mb-1">
+    <span className="font-semibold">Restaurant:</span>{" "}
+    {ordersItem.restaurant.name}
+   </div>
 
-                  <div className="text-lg mb-1">
-                    <span className="font-semibold">Check-in Date & Time:</span>{" "}
-                    {ordersItem.checkInTime ? new Date(ordersItem.checkInTime).toLocaleString() : "-"}
-                  </div>
-                  <div className="text-lg mb-1">
-                    <span className="font-semibold">Check-in Status:</span>{" "}
-                    {ordersItem.checkInStatus?"Checked-in":"Not Check-in yet"}
-                  </div>
-                  <div className="text-lg mb-1">
-                    <span className="font-semibold">
-                      Order Status: {ordersItem.status}
-                    </span>{" "}
-                
-                  </div>
-                  
-                </div>
+   <div className="text-lg mb-1">
+    <span className="font-semibold">Check-in Date & Time:</span>{" "}
+    {ordersItem.checkInTime ? new Date(ordersItem.checkInTime).toLocaleString() : "-"}
+   </div>
+   <div className="text-lg mb-1">
+    <span className="font-semibold">Check-in Status:</span>{" "}
+    {ordersItem.checkInStatus?"Checked-in":"Not Check-in yet"}
+   </div>
+   <div className="text-lg mb-1">
+    <span className="font-semibold">
+     Order Status: {ordersItem.status}
+    </span>{" "}
+   </div>
+  </div>
+ </div>
 
 
                 <div className="flex space-x-2 mt-4">
