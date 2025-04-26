@@ -94,7 +94,7 @@ export default function ReservationList() {
               </button>
               <button
                 className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-yellow-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-yellow-300 hover:text-black"
-                onClick={() => router.push(`/order/${reservationsItem.restaurant._id}`)}
+                onClick={() => router.push(`/order/${reservationsItem.restaurant._id}/${reservationsItem._id}`)}
               >
                 Order
               </button>
