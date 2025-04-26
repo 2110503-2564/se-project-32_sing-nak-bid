@@ -148,7 +148,7 @@ export default function ReservationList() {
             <h3 className="text-xl font-semibold text-gray-700 mb-2">No Reservations</h3>
             <p className="text-gray-500">You don't have any restaurant reservations yet.</p>
             <button 
-              onClick={() => router.push('/restaurants')}
+              onClick={() => router.push('/restaurant')}
               className="mt-6 bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-lg transition-colors duration-300"
             >
               Browse Restaurants
