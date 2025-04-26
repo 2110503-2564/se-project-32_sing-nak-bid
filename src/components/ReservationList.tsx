@@ -99,12 +99,7 @@ export default function ReservationList() {
                 Order
               </button>
 
-              <button
-                className="relative inline-block w-40 h-12 text-[17px] font-medium border-2 border-black bg-blue-500 text-white py-2 px-4 rounded-lg transition-colors duration-500 hover:bg-blue-300 hover:text-black"
-                onClick={() => router.push(`/myorder`)}
-              >
-                My Order
-              </button>
+      
 
             </div>
           </div>

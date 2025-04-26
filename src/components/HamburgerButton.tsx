@@ -62,6 +62,9 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
           <Link href="/myreservation" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Reservation</div>
           </Link>
+          <Link href="/myorder" onClick={() => setIsOpen(false)}>
+            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Order</div>
+          </Link>
           <Link href="/reserve" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reserve</div>
           </Link>
