@@ -49,9 +49,11 @@ export default function ReserveRestaurant() {
       return;
     }
 
-    // Check if the selected date is in the past
     const tomorrow = dayjs().add(1, 'day').startOf('day');
-    if (reserveDate.isBefore(tomorrow)) {
+    const sixtyDaysFromNow = dayjs().add(60, 'day').endOf('day');
+
+    // Check if the selected date is within the allowed range (tomorrow to 60 days from now)
+    if (reserveDate.isBefore(tomorrow) || reserveDate.isAfter(sixtyDaysFromNow)) {
       setShowErrorAlert(true);
       return;
     }
@@ -92,7 +94,7 @@ export default function ReserveRestaurant() {
     <main className="w-full flex flex-col items-center justify-center min-h-screen bg-[#F4ECDD] px-4">
       {showErrorAlert && (
         <ErrorAlert
-          message="Please fill out all fields or select a date from tomorrow onwards."
+          message="Please select a date from tomorrow onwards and within the next 60 days."
           onClose={() => setShowErrorAlert(false)}
         />
       )}
