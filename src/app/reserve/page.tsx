@@ -38,38 +38,39 @@ export default function ReserveRestaurant() {
     };
     fetchRestaurants();
   }, []);
-  
+
 
   const makeReservation = async () => {
     console.log("Session Token:", session?.user?.token);
     console.log("Selected Restaurant ID:", selectedRestaurantId);
     console.log("Reserve Date:", reserveDate);
-  
+
     if (!session?.user?.token || !selectedRestaurantId || !reserveDate) {
       setShowErrorAlert(true);
       return;
     }
 
-    const today = dayjs().startOf('day');
-    const selectedDate = dayjs(reserveDate).startOf('day');
+    const tomorrow = dayjs().add(1, 'day').startOf('day');
+    const sixtyDaysFromNow = dayjs().add(60, 'day').endOf('day');
 
-    if(selectedDate.isBefore(today)){
+    // Check if the selected date is within the allowed range (tomorrow to 60 days from now)
+    if (reserveDate.isBefore(tomorrow) || reserveDate.isAfter(sixtyDaysFromNow)) {
       setShowErrorDayAlert(true);
       return;
-  }
-  
+    }
+
     const reservationItem = {
       reservationDateTime: dayjs(reserveDate).toISOString(),
       restaurant: selectedRestaurantId,
     };
-  
+
     const success = await addReserve(
       reservationItem.reservationDateTime,
       "pending",
       selectedRestaurantId,
       session.user.token
     );
-  
+
     if (success) {
       dispatch(
         reduxBooking({
@@ -88,7 +89,7 @@ export default function ReserveRestaurant() {
       setShowSuccessAlert(false);
     }
   };
-  
+
 
   return (
     <main className="w-full flex flex-col items-center justify-center min-h-screen bg-[#F4ECDD] px-4">
@@ -106,7 +107,7 @@ export default function ReserveRestaurant() {
       )}
       {showErrorDayAlert && (
         <ErrorAlert
-          message="Please select a future date."
+          message="Please select a date from tomorrow onwards and within the next 60 days."
           onClose={() => setShowErrorDayAlert(false)}
         />
       )}
