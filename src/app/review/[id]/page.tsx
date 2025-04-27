@@ -3,9 +3,12 @@
 import { useEffect, useState } from 'react';
 import getRestaurant from '@/libs/getRestaurant';
 import { Rating } from '@mui/material';
-import styles from './ReviewPage.module.css'
+import styles from './ReviewPage.module.css';
+import { useSession } from 'next-auth/react';
+import addRating from '@/libs/addRating';
 
 export default function ReviewPage({ params }: { params: { id: string } }) {
+  const { data: session } = useSession();
   const [restaurant, setRestaurant] = useState<any | null>(null);
   const [name, setName] = useState('');
   const [rating, setRating] = useState<number | null>(0); 
@@ -25,10 +28,29 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
     fetchRestaurant();
   }, [params.id]);
 
-  // Handle form submission
-  const handleSubmit = async (e: React.FormEvent) => {
-    // Still WIP
-  };
+  // Handle form submission // WIP from Markkongphop anyone can edit I need to do some other thing
+  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   console.log("Session Token:", session?.user?.token);
+  //   console.log("Selected Restaurant ID:", restaurant.id);
+  //   console.log("Score:", rating);
+  //   console.log("Comment:", comment);
+
+  //   if (!session?.user?.token || !restaurant || !rating || !comment) {
+  //     alert("Please fill all field");
+  //     // setShowErrorAlert(true);
+  //     return;
+  //   }
+    
+  //   const success = await addRating(rating,comment,restaurant,session?.user?.token)
+
+  //   if(success){
+  //     alert("Thank for review our Restaurant!");
+  //     alert(restaurant);
+  //     alert(rating);
+  //     alert(comment);
+  //   }
+  // };
 
   if (!restaurant) {
     return <p>Loading restaurant details...</p>;
