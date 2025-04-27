@@ -106,7 +106,7 @@ export default function ManagerPage() {
     
     // Update on the server
     try {
-      await updateOrderStatus(orderItemId, newStatus, session.user.token as string);
+      await updateOrderStatus(orderItemId, newStatus, session.user.token);
       console.log(`Updated order item ${orderItemId} to status: ${newStatus}`);
       
       // Refresh data to ensure we have the latest state
