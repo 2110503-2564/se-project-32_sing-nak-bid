@@ -5,6 +5,8 @@ import MenuOrdered from "../MenuOrdered";
 import { useSession } from "next-auth/react";
 import getReserves from "@/libs/getReserves";
 import updateOrderStatus from "@/libs/updateOrderStatus";
+// Import icons
+import { ClipboardList, Clock, CheckCircle, Coffee, ShoppingBag } from "lucide-react";
 
 type InnerOrderItem = {
   _id: string;
@@ -110,7 +112,7 @@ export default function ManagerPage() {
     const newIndex = ORDER_STATES.indexOf(newStatus);
     
     if (newIndex < currentIndex) {
-      setError("ไม่สามารถย้ายออเดอร์ย้อนกลับไปยังสถานะก่อนหน้าได้");
+      setError("Unable to move the order back to its previous status");
       return;
     }
     
@@ -136,7 +138,7 @@ export default function ManagerPage() {
       }
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
-      setError("ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้ง");
+      setError("Failed to update order status. Please try again");
       
       // Revert optimistic update if API call fails
       fetchReservations();
@@ -158,7 +160,7 @@ export default function ManagerPage() {
 
   const handleCardClick = async (orderItemId: string, currentStatus: OrderItem["status"]) => {
     if (!session?.user?.token) {
-      setError("คุณไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
+      setError("You are not logged in. Please log in again.");
       return;
     }
     
@@ -195,7 +197,7 @@ export default function ManagerPage() {
       }
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
-      setError("ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้ง");
+      setError("Failed to update order status. Please try again");
       
       // Revert optimistic update
       fetchReservations();
@@ -203,10 +205,10 @@ export default function ManagerPage() {
   };
 
   const renderColumn = (status: "pending" | "preparing") => {
-    // Map the status to display text
-    const statusText = {
-      pending: "PENDING",
-      preparing: "PREPARING",
+    // Map the status to display text and icon
+    const statusInfo = {
+      pending: { text: "PENDING", icon: <Clock size={20} /> },
+      preparing: { text: "PREPARING", icon: <Coffee size={20} /> },
     };
 
     return (
@@ -215,7 +217,9 @@ export default function ManagerPage() {
         onDrop={(e) => onDrop(e, status)}
         onDragOver={(e) => allowDrop(e, status)}
       >
-        <h2 className={styles.heading}>{statusText[status]}</h2>
+        <h2 className={styles.heading}>
+          {statusInfo[status].icon} {statusInfo[status].text}
+        </h2>
         {reservations
           .flatMap((reservation) =>
             reservation.orderItems
@@ -233,9 +237,9 @@ export default function ManagerPage() {
                       {item.note} x {item.quantity}
                     </div>
                   ))}
-                  <p>ออเดอร์โดย: {reservation.user.email || "ไม่ระบุอีเมล"}</p>
-                  <p>เบอร์โทร: {orderItem.phoneNumber}</p>
-                  <p>รวม: {orderItem.totalPrice} บาท</p>
+                  <p>Order by: {reservation.user.email || "ไม่ระบุอีเมล"}</p>
+                  <p>Tel: {orderItem.phoneNumber}</p>
+                  <p>Total: {orderItem.totalPrice} Baht</p>
                 </div>
               )) || []
           )}
@@ -251,7 +255,9 @@ export default function ManagerPage() {
         onDrop={(e) => onDrop(e, "completed")}
         onDragOver={(e) => allowDrop(e, "completed")}
       >
-        <h2 className={styles.heading}>COMPLETE</h2>
+        <h2 className={styles.heading}>
+          <CheckCircle size={20} /> COMPLETE
+        </h2>
         <div className={styles.dropHere}>
           Drag order here to set status to be Complete
         </div>
@@ -262,7 +268,7 @@ export default function ManagerPage() {
   return (
     <div>
       <div className={styles.header}>
-        Order List
+        <ClipboardList size={28} /> Order List
         {isLoading && <span className={styles.loading}> Loading...</span>}
       </div>
       
@@ -279,8 +285,10 @@ export default function ManagerPage() {
         {renderCompleteColumn()}
       </div>
       
-      {/* Pass the restaurantId to MenuOrdered component */}
-      {restaurantId && <MenuOrdered restaurantId={restaurantId} />}
+      {/* Wrap MenuOrdered in a div with menuSection class */}
+      <div className={styles.menuSection}>
+        {restaurantId && <MenuOrdered restaurantId={restaurantId} />}
+      </div>
     </div>
   );
 }
