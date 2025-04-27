@@ -14,6 +14,7 @@ type InnerOrderItem = {
     _id: string;
     name: string;
   };
+  menuName:string;
   quantity: number;
   note?: string;
 };
@@ -235,7 +236,8 @@ export default function ManagerPage() {
                 >
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
-                      {item.note} x {item.quantity}
+                      {item.menuName} <div>(หมายเหตุ: {item.note} )
+                       x {item.quantity}</div>
                     </div>
                   ))}
                   <p>Order by: {orderItem.emailUser || "ไม่ระบุอีเมล"}</p>

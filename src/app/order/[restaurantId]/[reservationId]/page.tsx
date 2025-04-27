@@ -202,7 +202,7 @@ const OrdersMenuPage = () => {
     if (selectedMenuItem) {
       const existingItemIndex = cartItems.findIndex(item =>
         item._id === selectedMenuItem._id &&
-        item.note === selectedMenuItem.name +" (หมายเหตุ: "+(specialRequest.trim() || '-') +")" // ใช้ note แทน specialRequests
+        item.note === (specialRequest.trim() || '')// ใช้ note แทน specialRequests
       );
 
       if (existingItemIndex !== -1) {
@@ -215,7 +215,7 @@ const OrdersMenuPage = () => {
         const newItem: CartItem = {
           ...selectedMenuItem,
           quantity: quantity,
-          note: selectedMenuItem.name +" (หมายเหตุ: "+(specialRequest.trim() || '-') +")" // ใช้ note แทน specialRequests
+          note: specialRequest.trim() || '' // ใช้ note แทน specialRequests
         };
         setCartItems([...cartItems, newItem]);
       }
@@ -258,6 +258,7 @@ const OrdersMenuPage = () => {
 
     const orderItemsToSend = cartItems.map(cartItem => ({
       menuItem: cartItem._id, // ส่ง _id ของ MenuItem โดยตรง
+      menuName:cartItem.name,
       quantity: cartItem.quantity,
       note: cartItem.note,
     }));
