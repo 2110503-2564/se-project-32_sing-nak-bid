@@ -230,8 +230,7 @@ export default function ManagerPage() {
                 >
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
-                      {item.menuItem.name} x {item.quantity}
-                      {item.note && ` (หมายเหตุ: ${item.note})`}
+                      {item.note} x {item.quantity}
                     </div>
                   ))}
                   <p>ออเดอร์โดย: {reservation.user.email || "ไม่ระบุอีเมล"}</p>

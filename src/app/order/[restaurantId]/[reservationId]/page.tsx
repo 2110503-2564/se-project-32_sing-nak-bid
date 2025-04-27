@@ -202,7 +202,7 @@ const OrdersMenuPage = () => {
     if (selectedMenuItem) {
       const existingItemIndex = cartItems.findIndex(item =>
         item._id === selectedMenuItem._id &&
-        item.note === (specialRequest.trim() || undefined) // ใช้ note แทน specialRequests
+        item.note === selectedMenuItem.name +" (หมายเหตุ: "+(specialRequest.trim() || '-') +")" // ใช้ note แทน specialRequests
       );
 
       if (existingItemIndex !== -1) {
@@ -215,7 +215,7 @@ const OrdersMenuPage = () => {
         const newItem: CartItem = {
           ...selectedMenuItem,
           quantity: quantity,
-          note: specialRequest.trim() || undefined // ใช้ note แทน specialRequests
+          note: selectedMenuItem.name +" (หมายเหตุ: "+(specialRequest.trim() || '-') +")" // ใช้ note แทน specialRequests
         };
         setCartItems([...cartItems, newItem]);
       }
