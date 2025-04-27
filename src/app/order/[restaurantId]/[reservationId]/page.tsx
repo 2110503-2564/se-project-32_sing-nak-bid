@@ -266,12 +266,14 @@ const OrdersMenuPage = () => {
 
     const userProfile = await getUserProfile(token);
     const phoneNumberFromProfile = userProfile.data.telnumber;
+    const EmailFromProfile = userProfile.data.email;
 
     const orderData = {
       orderItems: orderItemsToSend,
       totalPrice: totalPrice,
       // คุณอาจต้องส่ง status เริ่มต้นด้วย เช่น 'pending'
       phoneNumber: phoneNumberFromProfile,
+      emailUser:EmailFromProfile,
       status: 'pending',
     };
 

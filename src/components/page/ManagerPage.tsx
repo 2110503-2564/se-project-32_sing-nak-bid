@@ -26,6 +26,7 @@ type OrderItem = {
   checkInTime: string | null;
   totalPrice: number;
   phoneNumber: string;
+  emailUser:string;
   status: "pending" | "preparing" | "completed" | "cancelled";
   orderItems: InnerOrderItem[];
   createdAt: string;
@@ -237,7 +238,7 @@ export default function ManagerPage() {
                       {item.note} x {item.quantity}
                     </div>
                   ))}
-                  <p>Order by: {reservation.user.email || "ไม่ระบุอีเมล"}</p>
+                  <p>Order by: {orderItem.emailUser || "ไม่ระบุอีเมล"}</p>
                   <p>Tel: {orderItem.phoneNumber}</p>
                   <p>Total: {orderItem.totalPrice} Baht</p>
                 </div>
