@@ -72,7 +72,7 @@
 }
 
 .card {
-  background-color: #ED8265;
+  background-color: #ea5c35;
   color: #fff;
   padding: 1rem;
   margin-bottom: 1rem;
@@ -108,4 +108,58 @@
 .menuSection {
   margin-top: 1rem;
   padding: 0 1rem;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 10px;
+}
+
+.revenueButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.revenueButton:hover {
+  background-color: #388e3c;
+}
+
+.revenuePanel {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.revenuePanel h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  color: #333;
+  font-size: 18px;
+}
+
+.revenueAmount {
+  display: flex;
+  align-items: center;
+  font-size: 22px;
+  font-weight: bold;
+  color: #2e7d32;
+}
+
+.revenueAmount svg {
+  margin-right: 8px;
 }

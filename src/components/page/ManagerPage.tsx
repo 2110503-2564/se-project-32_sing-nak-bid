@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import getReserves from "@/libs/getReserves";
 import updateOrderStatus from "@/libs/updateOrderStatus";
 // Import icons
-import { ClipboardList, Clock, CheckCircle, Coffee, ShoppingBag } from "lucide-react";
+import { ClipboardList, Clock, CheckCircle, Coffee, ShoppingBag, DollarSign } from "lucide-react";
 
 type InnerOrderItem = {
   _id: string;
@@ -14,7 +14,7 @@ type InnerOrderItem = {
     _id: string;
     name: string;
   };
-  menuName:string;
+  menuName: string;
   quantity: number;
   note?: string;
 };
@@ -27,7 +27,7 @@ type OrderItem = {
   checkInTime: string | null;
   totalPrice: number;
   phoneNumber: string;
-  emailUser:string;
+  emailUser: string;
   status: "pending" | "preparing" | "completed" | "cancelled";
   orderItems: InnerOrderItem[];
   createdAt: string;
@@ -65,6 +65,8 @@ export default function ManagerPage() {
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
   const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [showRevenue, setShowRevenue] = useState(false);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const fetchReservations = async () => {
     if (session?.user?.token) {
@@ -78,6 +80,14 @@ export default function ManagerPage() {
         if (bookings.data.length > 0 && bookings.data[0].restaurant?._id) {
           setRestaurantId(bookings.data[0].restaurant._id);
         }
+        
+        // Calculate total revenue from completed orders
+        const completedOrders = bookings.data
+          .flatMap(reservation => reservation.orderItems || [])
+          .filter(order => order?.status === "completed");
+          
+        const revenue = completedOrders.reduce((total, order) => total + (order.totalPrice || 0), 0);
+        setTotalRevenue(revenue);
       } catch (error: any) {
         console.error("Failed to fetch reservations:", error.message);
         setError("Unable to retrieve reservations data, please try again.");
@@ -123,21 +133,8 @@ export default function ManagerPage() {
       await updateOrderStatus(orderItemId, newStatus, session.user.token);
       console.log(`Updated order item ${orderItemId} to status: ${newStatus}`);
       
-      // If moving to completed, remove from UI
-      if (newStatus === "completed") {
-        // Refresh the entire data
-        fetchReservations();
-      } else {
-        // For other statuses, update UI optimistically
-        setReservations((prev) =>
-          prev.map((reservation) => ({
-            ...reservation,
-            orderItems: reservation.orderItems?.map((order) =>
-              order._id === orderItemId ? { ...order, status: newStatus } as OrderItem : order
-            ),
-          }))
-        );
-      }
+      // If moving to completed, refresh data to update revenue
+      fetchReservations();
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
       setError("Failed to update order status. Please try again");
@@ -183,20 +180,8 @@ export default function ManagerPage() {
       await updateOrderStatus(orderItemId, nextStatus, session.user.token as string);
       console.log(`Clicked order item: ${orderItemId}, new status: ${nextStatus}`);
       
-      // If moving to completed, remove from UI by refreshing data
-      if (nextStatus === "completed") {
-        fetchReservations();
-      } else {
-        // For other statuses, update UI optimistically
-        setReservations((prev) =>
-          prev.map((reservation) => ({
-            ...reservation,
-            orderItems: reservation.orderItems?.map((order) =>
-              order._id === orderItemId ? { ...order, status: nextStatus } as OrderItem : order
-            ),
-          }))
-        );
-      }
+      // Refresh data to update revenue if moving to completed
+      fetchReservations();
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
       setError("Failed to update order status. Please try again");
@@ -204,6 +189,10 @@ export default function ManagerPage() {
       // Revert optimistic update
       fetchReservations();
     }
+  };
+
+  const toggleRevenueDisplay = () => {
+    setShowRevenue(!showRevenue);
   };
 
   const renderColumn = (status: "pending" | "preparing") => {
@@ -270,10 +259,28 @@ export default function ManagerPage() {
 
   return (
     <div>
-      <div className={styles.header}>
-        <ClipboardList size={28} /> Order List
-        {isLoading && <span className={styles.loading}> Loading...</span>}
+      <div className={styles.headerContainer}>
+        <div className={styles.header}>
+          <ClipboardList size={28} /> Order List
+          {isLoading && <span className={styles.loading}> Loading...</span>}
+        </div>
+        <button 
+          className={styles.revenueButton} 
+          onClick={toggleRevenueDisplay}
+        >
+          <DollarSign size={20} /> Revenue
+        </button>
       </div>
+      
+      {showRevenue && (
+        <div className={styles.revenuePanel}>
+          <h3>Total Revenue from Completed Orders</h3>
+          <div className={styles.revenueAmount}>
+            <DollarSign size={24} />
+            <span>{totalRevenue.toFixed(2)} Baht</span>
+          </div>
+        </div>
+      )}
       
       {error && (
         <div className={styles.error}>

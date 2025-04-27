@@ -35,8 +35,8 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
         // เรียกใช้ getMenus และรับข้อมูล
         const response = await getMenus(idToUse);
         
-        // ตรวจสอบโครงสร้างข้อมูลและแปลงให้เป็น array ที่ถูกต้อง
-        console.log("API Response:", response); // แสดง log เพื่อดูโครงสร้างข้อมูล
+        // Debug: แสดง log เพื่อดูโครงสร้างข้อมูล
+        console.log("API Response:", response);
         
         let items: MenuItemOrdered[] = [];
         
@@ -57,6 +57,16 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
             }
           }
         }
+        
+        // สำคัญ: เพิ่มเงื่อนไขให้ orderCount เป็น 0 ถ้าไม่มีค่า และตรวจสอบค่า recommended
+        items = items.map(item => ({
+          ...item,
+          orderCount: item.orderCount !== undefined ? item.orderCount : 0,
+          recommended: item.recommended !== undefined ? item.recommended : false
+        }));
+        
+        // Debug: แสดงข้อมูลหลังจากแปลงแล้ว
+        console.log("Processed items:", items);
         
         setMenuItems(items);
       } catch (err) {
@@ -86,8 +96,12 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
         )
       );
 
-      // Send update to API
-      const response = await fetch(`/api/menu-items/${itemId}/recommend`, {
+      // Debug: แสดงข้อมูลการเรียก API
+      const apiUrl = `/api/menu-items/${itemId}/recommend`;
+      console.log(`Sending PATCH request to: ${apiUrl}`);
+      console.log(`Request body:`, { recommended: newRecommendedValue });
+      
+      const response = await fetch(apiUrl, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -96,11 +110,17 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update recommendation status');
+        // พยายามอ่านข้อมูล error จาก response
+        const errorData = await response.json().catch(() => null);
+        console.error('API error details:', errorData);
+        throw new Error(`Failed to update recommendation status: ${response.status}`);
       }
+
+      console.log('Successfully updated recommendation status');
 
     } catch (err) {
       console.error('Error updating recommendation status:', err);
+      
       // Revert UI changes on error
       setMenuItems(prev => 
         prev.map(item => 
@@ -109,6 +129,9 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
             : item
         )
       );
+      
+      // แสดง alert เพื่อแจ้งผู้ใช้
+      alert('ไม่สามารถอัพเดทสถานะเมนูแนะนำได้ กรุณาลองใหม่อีกครั้ง');
     }
   };
 
