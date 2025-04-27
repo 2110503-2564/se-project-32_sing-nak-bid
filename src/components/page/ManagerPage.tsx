@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import styles from "./ManagerPage.module.css";
+import MenuOrdered from "../MenuOrdered";
 
 type Task = {
   id: string;
@@ -90,6 +91,7 @@ export default function ManagerPage() {
         {renderColumn("preparing")}
         {renderColumn("complete")}
       </div>
+      <MenuOrdered />
     </div>
   );
 }
