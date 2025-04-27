@@ -2,7 +2,7 @@ export default async function updateMenu(
     token: string,
     restaurantId: string,
     menuId:string,
-    orderCount:Number
+    orderCount:Number //= old orderCount + new orderCount 
   ) {
     const response = await fetch(
       `http://localhost:5000/api/v1/restaurants/${restaurantId}/menu/${menuId}`,
