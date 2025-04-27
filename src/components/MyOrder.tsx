@@ -152,8 +152,8 @@ export default function MyOrder() {
    </div>
    <div className="text-lg mb-1">
     <span className="font-semibold">
-     Order Status: {ordersItem.status}
-    </span>{" "}
+     Order Status: 
+    </span>{" "}{ordersItem.status}
    </div>
   </div>
  </div>
