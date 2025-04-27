@@ -36,7 +36,8 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
 
   return (
     <div className={styles.container}>
-      <h1 className={styles.header}>Review {restaurant.name}</h1>
+    <img src="/img/Food4.png" alt={`${restaurant.name} picture`} className={styles.restaurantImage} />
+      <h1 className={styles.header}>Review {restaurant.name} Restaurant</h1>
 
       <form onSubmit={handleSubmit} className={styles.form}>
         <div className={styles.formGroup}>
@@ -61,7 +62,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
             value={rating}
             onChange={(_, newValue) => setRating(newValue)}
             precision={0.5}
-            size="medium"
+            size="large"
           />
         </div>
 
@@ -76,7 +77,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
             className={styles.textarea}
           />
         </div>
-        <button type="submit" disabled={isSubmitting} className={styles.submitButton}></button>
+        <button type="submit" disabled={isSubmitting} className={styles.submitButton}> Submit Review</button>
       </form>
     </div>
   );
