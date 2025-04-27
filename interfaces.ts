@@ -83,6 +83,14 @@ export interface OrdersItem {
   createdAt: string;
 }
 
+export interface MenuItemOrdered {
+  _id: string;
+  name: string;
+  price: number;
+  orderCount: number;
+  recommended: boolean;
+}
+
 export interface A {
   b: B[];
 }
