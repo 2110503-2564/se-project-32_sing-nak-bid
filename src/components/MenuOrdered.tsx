@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import styles from "./MenuOrdered.module.css";
 import { MenuItemOrdered } from "../../interfaces";
 import getMenus from "@/libs/getMenus";
+// Import icons
+import { Utensils, ShoppingBag, ThumbsUp } from "lucide-react";
 
 interface MenuOrderedProps {
   restaurantId?: string;
@@ -127,15 +129,27 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Menu Ordered</h2>
+      <h2 className={styles.title}>
+        <Utensils size={24} /> Menu Ordered
+      </h2>
       <div className={styles.tableContainer}>
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.nameHeader}>Menu name</th>
-              <th className={styles.countHeader}>Order quantity</th>
+              <th className={styles.nameHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Utensils size={16} /> Menu name
+                </div>
+              </th>
+              <th className={styles.countHeader}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ShoppingBag size={16} /> Order quantity
+                </div>
+              </th>
               <th className={styles.recommendHeader}>
-              Set as Recommended menu
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <ThumbsUp size={16} /> Set as Recommended menu
+                </div>
               </th>
             </tr>
           </thead>
