@@ -5,8 +5,9 @@ import MenuOrdered from "../MenuOrdered";
 import { useSession } from "next-auth/react";
 import getReserves from "@/libs/getReserves";
 import updateOrderStatus from "@/libs/updateOrderStatus";
+import Link from "next/link";
 // Import icons
-import { ClipboardList, Clock, CheckCircle, Coffee, ShoppingBag, DollarSign } from "lucide-react";
+import { ClipboardList, Clock, CheckCircle, Coffee, DollarSign, Star } from "lucide-react";
 
 type InnerOrderItem = {
   _id: string;
@@ -202,9 +203,11 @@ export default function ManagerPage() {
       preparing: { text: "PREPARING", icon: <Coffee size={20} /> },
     };
 
+    const columnClass = status === "pending" ? styles.columnPending : styles.columnPreparing;
+
     return (
       <div
-        className={styles.column}
+        className={`${styles.column} ${columnClass}`}
         onDrop={(e) => onDrop(e, status)}
         onDragOver={(e) => allowDrop(e, status)}
       >
@@ -258,7 +261,7 @@ export default function ManagerPage() {
   };
 
   return (
-    <div>
+    <div className={styles.container}>
       <div className={styles.headerContainer}>
         <div className={styles.header}>
           <ClipboardList size={28} /> Order List
@@ -299,6 +302,17 @@ export default function ManagerPage() {
       <div className={styles.menuSection}>
         {restaurantId && <MenuOrdered restaurantId={restaurantId} />}
       </div>
+      
+      {/* View Reviews Button */}
+      {restaurantId && (
+        <div className={styles.reviewButtonContainer}>
+          <Link href={`/reviews/${restaurantId}`} passHref>
+            <div className={styles.reviewButton}>
+              <Star size={20} /> View Reviews
+            </div>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
