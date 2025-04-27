@@ -1,97 +1,51 @@
 "use client";
-import { useState } from "react";
-import styles from "./ManagerPage.module.css";
-import MenuOrdered from "../MenuOrdered";
 
-type Task = {
-  id: string;
-  title: string;
-  status: "pending" | "preparing" | "complete";
-};
+import Banner from "../Banner";
+import Homepage from "../HomepageCard"
+import styles from "../Button.module.css";
+import { useRouter } from "next/navigation";
 
-const initialTasks: Task[] = [
-  { id: "1", title: "Review goals", status: "pending" },
-  { id: "2", title: "Prepare report", status: "preparing" },
-  { id: "3", title: "Send email", status: "complete" },
-];
+export default function UserPage() {
 
-export default function ManagerPage() {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const router = useRouter();
 
-  const onDragStart = (e: React.DragEvent<HTMLDivElement>, taskId: string) => {
-    e.dataTransfer.setData("text/plain", taskId);
-  };
-
-  const onDrop = (
-    e: React.DragEvent<HTMLDivElement>,
-    newStatus: Task["status"]
-  ) => {
-    const taskId = e.dataTransfer.getData("text/plain");
-  
-    setTasks((prev) => {
-      const taskToMove = prev.find((task) => task.id === taskId);
-      if (!taskToMove) return prev;
-      const filtered = prev.filter((task) => task.id !== taskId);
-      return [...filtered, { ...taskToMove, status: newStatus }];
-    });
-  };
-  
-  const allowDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-  };
-
-  const handleCardClick = (taskId: string) => {
-    setTasks((prev) =>
-      prev.map((task) => {
-        if (task.id !== taskId) return task;
-  
-        const nextStatus: Task["status"] =
-          task.status === "pending"
-            ? "preparing"
-            : task.status === "preparing"
-            ? "complete"
-            : "complete"; 
-  
-        return { ...task, status: nextStatus };
-      })
-    );
-  };
-  
-
-  const renderColumn = (status: Task["status"]) => (
-    <div
-      className={styles.column}
-      onDrop={(e) => onDrop(e, status)}
-      onDragOver={allowDrop}
-    >
-      <h2 className={styles.heading}>{status.toUpperCase()}</h2>
-      {tasks
-        .filter((task) => task.status === status)
-        .map((task) => (
-          <div
-            key={task.id}
-            className={styles.card}
-            draggable
-            onDragStart={(e) => onDragStart(e, task.id)}
-            onClick={() => handleCardClick(task.id)}
+    return (
+      <>
+      
+        <div>
+        <Banner />
+         
+         {/* เพิ่ม Component Homepage เพื่อโชว์ภาพร้านอาหารตัวอย่าง */}
+         <div className="flex flex-row px-6 space-x-12 pt-2 pb-9">
+        <Homepage
+         restaurantName="Jeh-O Chula"
+         imgSrc="/img/Food1.jpg"
+         description="A small shophouse with a simple appearance that doesn't only have delicious Mama Oho, Je Oh has many other top menus, most of which are familiar Thai-Chinese comfort foods. But what makes it different is the use of quality ingredients and excellent cooking skills. Therefore, each dish is perfectly delicious. Popular menus such as crispy fried tofu with garlic, delicious duck rice soup, and Je Oh's special recipe crispy pork are really not to be missed."
+        />
+        
+        <Homepage
+         restaurantName="Louisvanich"
+         imgSrc="/img/Food2.png"
+         description="Louis Wanich is another famous restaurant in the Banthat Thong area. It is a restaurant that serves made-to-order dishes with delicious flavors and is decorated like a grocery store. If you go to this area, I'm telling you, you can't miss it."
+        />
+        
+        </div>
+       
+        <div className="w-full flex justify-center mb-10">
+          <button
+            className={`group ${styles["button"]}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              router.push("/restaurant");
+            }}
           >
-            {task.title}
-          </div>
-        ))}
-    </div>
-  );
+            <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+              View Restaurants
+            </span>
+          </button>
+        </div>
 
-  return (
-    <div>
-      <div className={styles.header}>
-        Order List
-      </div>
-      <div className={styles.board}>
-        {renderColumn("pending")}
-        {renderColumn("preparing")}
-        {renderColumn("complete")}
-      </div>
-      <MenuOrdered />
-    </div>
-  );
-}
+       </div>
+      </>
+    );
+  }
