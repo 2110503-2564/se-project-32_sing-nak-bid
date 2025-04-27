@@ -5,10 +5,11 @@
   padding: 30px; 
   background-color: #fffff5;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(78, 69, 35, 0.578);
   display: grid; 
   grid-template-columns: 1fr 1fr; 
   gap: 20px; 
+
 }
 
 .header {
@@ -31,6 +32,7 @@
   margin-bottom: 5px; 
   display: block; 
   color: #201335;
+  
 }
 
 .input,
@@ -40,9 +42,8 @@
   border-radius: 4px;
   border: 1px solid #ddd;
   width: 100%;
-  box-sizing: border-box; 
+  box-sizing: border-box;   
   outline: 1px solid #201335;
-  
 }
 
 .rating {
