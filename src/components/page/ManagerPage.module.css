@@ -52,3 +52,46 @@
   font-size: 3em;
   font-family: "Kanit", sans-serif;
 }
+
+.loading {
+  font-size: 0.9rem;
+  color: #666;
+  margin-left: 10px;
+  font-weight: normal;
+}
+
+.error {
+  background-color: #ffe6e6;
+  border: 1px solid #ff9999;
+  color: #cc0000;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error button {
+  background-color: #cc0000;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.error button:hover {
+  background-color: #b30000;
+}
+
+/* ปรับปรุง card ที่มีอยู่เดิม - เพิ่มเติม transition */
+.card {
+  /* ใช้ properties ที่มีอยู่เดิม */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
