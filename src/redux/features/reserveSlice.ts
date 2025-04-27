@@ -17,7 +17,7 @@ export const reserveSlice = createSlice({
       const index = state.reserveItems.findIndex(
         (item) =>
           item.restaurant._id === action.payload.restaurant._id &&
-          item.reservationDate === action.payload.reservationDate
+          item.reservationDateTime === action.payload.reservationDateTime
       );
 
       if (index !== -1) {
@@ -31,7 +31,7 @@ export const reserveSlice = createSlice({
       const remainItems = state.reserveItems.filter((item) => {
         return (
           item.restaurant._id !== action.payload.restaurant._id ||
-          item.reservationDate !== action.payload.reservationDate
+          item.reservationDateTime !== action.payload.reservationDateTime
         );
       });
 
