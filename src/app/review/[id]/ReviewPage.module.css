@@ -79,7 +79,7 @@
   padding: 10px 20px;
   font-size: 16px; 
   font-weight: bold;
-  background-color: #4CAF50;
+  background-color: #ff5353;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -88,8 +88,8 @@
 }
 
 .submitButton:hover {
-  background-color: #7ac157;
-  box-shadow: 0 0 0 5px #81ff685f;
+  background-color: #ff8279;
+  box-shadow: 0 0 0 5px #ff6d6d5f;
   color: #000000;
 }
 
