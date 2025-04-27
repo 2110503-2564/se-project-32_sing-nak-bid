@@ -3,7 +3,7 @@
   min-height: 500px; 
   margin: 50px auto 0;
   padding: 30px; 
-  background-color: #f5e6d3;
+  background-color: #fffff5;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   display: grid; 
@@ -13,10 +13,11 @@
 
 .header {
   text-align: center;
-  font-size: 24px;
+  font-size: 35px;
   margin-bottom: 20px; 
   grid-column: 1 / span 2; 
-  color: #a90f12;
+  color: #aa2b08;
+  font-weight: bold;
 }
 
 
@@ -29,7 +30,7 @@
   font-weight: bold;
   margin-bottom: 5px; 
   display: block; 
-  color: #2c3e50;
+  color: #201335;
 }
 
 .input,
@@ -40,6 +41,8 @@
   border: 1px solid #ddd;
   width: 100%;
   box-sizing: border-box; 
+  outline: 1px solid #201335;
+  
 }
 
 .rating {
@@ -81,13 +84,13 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .submitButton:hover {
-  padding: 24px 48px;
-  font-size: 24px;
-  background-color: #45a049; 
+  background-color: #7ac157;
+  box-shadow: 0 0 0 5px #81ff685f;
+  color: #000000;
 }
 
 .restaurantImage {
@@ -99,7 +102,7 @@
   align-items: center;
   margin-bottom: 15px;
   border-radius: 4px;
-  grid-column: 1 / 2; 
+  grid-column: 1 / -1;
 }
 
 .restaurantImage::before {

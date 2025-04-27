@@ -247,6 +247,8 @@ const RestaurantDetailPage = () => {
               </button>
 
               {/* Review Button */}
+              {/* add div to make the button not too close with each other */}
+              <div className="mx-5"> 
               <button
                 className={`group ${styles["button"]}`}
                 onClick={(e) => {
@@ -258,6 +260,7 @@ const RestaurantDetailPage = () => {
                   Write a review
                 </span>
               </button>
+              </div>
             </div>
           </div>
           <div className="flex-shrink-0 ml-4">
