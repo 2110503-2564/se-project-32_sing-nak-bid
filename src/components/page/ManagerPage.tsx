@@ -94,29 +94,19 @@ export default function ManagerPage() {
       return;
     }
     
-    const reservation = reservations.find(res =>
-            res.orderItems?.some(order => order._id === orderItemId)
-          );
-          const reservationId = reservation?._id;
-      
-          if (!reservationId) {
-            console.error("ไม่พบ reservationId สำหรับ orderItemId:", orderItemId);
-            setError("เกิดข้อผิดพลาด: ไม่พบข้อมูลการจอง");
-            return;
-          }
-      
-          // Optimistic update - update UI immediately
-          setReservations((prev) =>
-            prev.map((res) => ({
-              ...res,
-              orderItems: res.orderItems?.map((order) =>
-                order._id === orderItemId ? { ...order, status: newStatus } as OrderItem : order
-              ),
-            }))
-          );
+    // Optimistic update - update UI immediately
+    setReservations((prev) =>
+      prev.map((reservation) => ({
+        ...reservation,
+        orderItems: reservation.orderItems?.map((order) =>
+          order._id === orderItemId ? { ...order, status: newStatus } as OrderItem : order
+        ),
+      }))
+    );
+    
     // Update on the server
     try {
-      await updateOrderStatus(orderItemId, newStatus,reservationId, session.user.token as string);
+      await updateOrderStatus(orderItemId, newStatus, session.user.token);
       console.log(`Updated order item ${orderItemId} to status: ${newStatus}`);
       
       // Refresh data to ensure we have the latest state
@@ -163,19 +153,8 @@ export default function ManagerPage() {
     );
     
     // Update on server
-    const reservation = reservations.find(res =>
-            res.orderItems?.some(order => order._id === orderItemId)
-          );
-          const reservationId = reservation?._id;
-      
-          if (!reservationId) {
-            console.error("ไม่พบ reservationId สำหรับ orderItemId:", orderItemId);
-            setError("เกิดข้อผิดพลาด: ไม่พบข้อมูลการจอง");
-            return;
-          }
-
     try {
-      await updateOrderStatus(orderItemId, nextStatus,reservationId ,session.user.token as string);
+      await updateOrderStatus(orderItemId, nextStatus, session.user.token as string);
       console.log(`Clicked order item: ${orderItemId}, new status: ${nextStatus}`);
       
       // Refresh data

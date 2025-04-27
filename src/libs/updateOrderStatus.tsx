@@ -1,11 +1,10 @@
-const updateOrderStatus = async (
+export default async function updateOrderStatus(
   orderId: string,
   newStatus: "pending" | "preparing" | "completed" | "cancelled",
-  reservationId:string,
   token: string
-) => {
+) {
   const response = await fetch(
-    `http://localhost:5000/api/v1/reservations/${reservationId}/order/${orderId}`,
+    `http://localhost:5000/api/v1/order/${orderId}`,
     {
       method: "PUT",
       headers: {
@@ -25,4 +24,3 @@ const updateOrderStatus = async (
   return await response.json();
 };
 
-export default updateOrderStatus;
