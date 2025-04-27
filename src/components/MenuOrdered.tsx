@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import styles from "./MenuOrdered.module.css";
+import { MenuItemOrdered } from "../../interfaces";
+import getMenuOrdered from "@/libs/getMenuOrdered";
 
 interface MenuItem {
   _id: string;
@@ -15,7 +17,7 @@ interface MenuOrderedProps {
 }
 
 export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItemOrdered[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
