@@ -6,57 +6,105 @@ import { useSession } from "next-auth/react";
 import getReserves from "@/libs/getReserves";
 import updateOrderStatus from "@/libs/updateOrderStatus";
 
-type InnerOrderItem = {
+interface MenuItem {
   _id: string;
-  menuItem: {
-    _id: string;
-    name: string;
-  };
-  quantity: number;
-  note?: string;
-};
+  name: string;
+  price: number;
+  description: string;
+}
 
-type OrderItem = {
+interface OrderItem {
   _id: string;
-  reservation: string;
+  menuItem: MenuItem;
+  quantity: number;
+  note: string;
+}
+
+interface Reservation {
+  _id: string;
+  reservationDateTime: string;
+  user: user;
   restaurant: string;
+  status: "pending" | "confirmed" | "cancelled";
+  createdAt: string;
+  orderItems?: OrdersItem[];
+}
+
+interface user {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+  tel: string;
+  isBanned: boolean;
+  createAt: string;
+}
+
+interface OrdersItem {
+  _id: string;
+  reservation: Reservation;
   checkInStatus: boolean;
   checkInTime: string | null;
   totalPrice: number;
   phoneNumber: string;
   status: "pending" | "preparing" | "completed" | "cancelled";
-  orderItems: InnerOrderItem[];
+  orderItems: OrderItem[];
   createdAt: string;
-  __v: number;
-};
+}
 
-type Reservation = {
-  _id: string;
-  reservationDateTime: string;
-  user: {
-    _id: string;
-    email: string;
-    name?: string;
-  };
-  restaurant: {
-    _id: string;
-    name: string;
-    address: string;
-    tel: string;
-    id: string;
-  };
-  status: "pending" | "confirmed" | "cancelled";
-  createdAt: string;
-  __v: number;
-  orderItems?: OrderItem[];
-  id: string;
-};
+// type InnerOrderItem = {
+//   _id: string;
+//   menuItem: {
+//     _id: string;
+//     name: string;
+//   };
+//   quantity: number;
+//   note?: string;
+// };
+
+// type OrderItem = {
+//   _id: string;
+//   reservation: string;
+//   restaurant: string;
+//   checkInStatus: boolean;
+//   checkInTime: string | null;
+//   totalPrice: number;
+//   phoneNumber: string;
+//   status: "pending" | "preparing" | "completed" | "cancelled";
+//   orderItems: InnerOrderItem[];
+//   createdAt: string;
+//   __v: number;
+// };
+
+// type Reservation = {
+//   _id: string;
+//   reservationDateTime: string;
+//   user: {
+//     _id: string;
+//     email: string;
+//     name?: string;
+//   };
+//   restaurant: {
+//     _id: string;
+//     name: string;
+//     address: string;
+//     tel: string;
+//     id: string;
+//   };
+//   status: "pending" | "confirmed" | "cancelled";
+//   createdAt: string;
+//   __v: number;
+//   orderItems?: OrderItem[];
+//   id: string;
+// };
 
 export default function ManagerPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
+  const [deletedOrderIds, setDeletedOrderIds] = useState<string[]>([]);
 
   const fetchReservations = async () => {
     if (session?.user?.token) {
@@ -94,12 +142,17 @@ export default function ManagerPage() {
       return;
     }
     
+    if (newStatus === "completed") {
+      console.log("delete from drag");
+      setDeletedOrderIds((prev) => [...prev, orderItemId]);
+    }
+
     // Optimistic update - update UI immediately
     setReservations((prev) =>
       prev.map((reservation) => ({
         ...reservation,
         orderItems: reservation.orderItems?.map((order) =>
-          order._id === orderItemId ? { ...order, status: newStatus } as OrderItem : order
+          order._id === orderItemId ? { ...order, status: newStatus } as OrdersItem : order
         ),
       }))
     );
@@ -124,13 +177,13 @@ export default function ManagerPage() {
     e.preventDefault();
   };
 
-  const handleCardClick = async (orderItemId: string, currentStatus: OrderItem["status"]) => {
+  const handleCardClick = async (orderItemId: string, currentStatus: OrdersItem["status"]) => {
     if (!session?.user?.token) {
       setError("คุณไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
       return;
     }
     
-    let nextStatus: OrderItem["status"] = "pending";
+    let nextStatus: OrdersItem["status"] = "pending";
     
     // Determine next status based on current status
     if (currentStatus === "pending") {
@@ -141,13 +194,18 @@ export default function ManagerPage() {
       // No change if already completed
       return;
     }
+
+    if (nextStatus === "completed") {
+      console.log("delete from click");
+      setDeletedOrderIds((prev) => [...prev, orderItemId]);
+    }
     
     // Optimistic update
     setReservations((prev) =>
       prev.map((reservation) => ({
         ...reservation,
         orderItems: reservation.orderItems?.map((order) =>
-          order._id === orderItemId ? { ...order, status: nextStatus } as OrderItem : order
+          order._id === orderItemId ? { ...order, status: nextStatus } as OrdersItem : order
         ),
       }))
     );
@@ -186,7 +244,7 @@ export default function ManagerPage() {
         {reservations
           .flatMap((reservation) =>
             reservation.orderItems
-              ?.filter((order) => order.status === status)
+              ?.filter((order) => order.status === status /*&& !deletedOrderIds.includes(order._id)*/)
               .map((orderItem) => (
                 <div
                   key={orderItem._id}
@@ -194,6 +252,7 @@ export default function ManagerPage() {
                   draggable
                   onDragStart={(e) => onDragStart(e, orderItem._id)}
                   onClick={() => handleCardClick(orderItem._id, orderItem.status)}
+                  
                 >
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
