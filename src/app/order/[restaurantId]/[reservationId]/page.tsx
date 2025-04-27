@@ -202,7 +202,7 @@ const OrdersMenuPage = () => {
     if (selectedMenuItem) {
       const existingItemIndex = cartItems.findIndex(item =>
         item._id === selectedMenuItem._id &&
-        item.note === (specialRequest.trim() || undefined) // ใช้ note แทน specialRequests
+        item.note === (specialRequest.trim() || '')// ใช้ note แทน specialRequests
       );
 
       if (existingItemIndex !== -1) {
@@ -215,7 +215,7 @@ const OrdersMenuPage = () => {
         const newItem: CartItem = {
           ...selectedMenuItem,
           quantity: quantity,
-          note: specialRequest.trim() || undefined // ใช้ note แทน specialRequests
+          note: specialRequest.trim() || '' // ใช้ note แทน specialRequests
         };
         setCartItems([...cartItems, newItem]);
       }
@@ -258,6 +258,7 @@ const OrdersMenuPage = () => {
 
     const orderItemsToSend = cartItems.map(cartItem => ({
       menuItem: cartItem._id, // ส่ง _id ของ MenuItem โดยตรง
+      menuName:cartItem.name,
       quantity: cartItem.quantity,
       note: cartItem.note,
     }));
@@ -266,12 +267,14 @@ const OrdersMenuPage = () => {
 
     const userProfile = await getUserProfile(token);
     const phoneNumberFromProfile = userProfile.data.telnumber;
+    const EmailFromProfile = userProfile.data.email;
 
     const orderData = {
       orderItems: orderItemsToSend,
       totalPrice: totalPrice,
       // คุณอาจต้องส่ง status เริ่มต้นด้วย เช่น 'pending'
       phoneNumber: phoneNumberFromProfile,
+      emailUser:EmailFromProfile,
       status: 'pending',
     };
 

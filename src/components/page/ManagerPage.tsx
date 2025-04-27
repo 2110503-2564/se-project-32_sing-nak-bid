@@ -5,106 +5,66 @@ import MenuOrdered from "../MenuOrdered";
 import { useSession } from "next-auth/react";
 import getReserves from "@/libs/getReserves";
 import updateOrderStatus from "@/libs/updateOrderStatus";
+// Import icons
+import { ClipboardList, Clock, CheckCircle, Coffee, ShoppingBag } from "lucide-react";
 
-interface MenuItem {
+type InnerOrderItem = {
   _id: string;
-  name: string;
-  price: number;
-  description: string;
-}
-
-interface OrderItem {
-  _id: string;
-  menuItem: MenuItem;
+  menuItem: {
+    _id: string;
+    name: string;
+  };
+  menuName:string;
   quantity: number;
-  note: string;
-}
+  note?: string;
+};
 
-interface Reservation {
+type OrderItem = {
   _id: string;
-  reservationDateTime: string;
-  user: user;
+  reservation: string;
   restaurant: string;
-  status: "pending" | "confirmed" | "cancelled";
-  createdAt: string;
-  orderItems?: OrdersItem[];
-}
-
-interface user {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  password: string;
-  tel: string;
-  isBanned: boolean;
-  createAt: string;
-}
-
-interface OrdersItem {
-  _id: string;
-  reservation: Reservation;
   checkInStatus: boolean;
   checkInTime: string | null;
   totalPrice: number;
   phoneNumber: string;
+  emailUser:string;
   status: "pending" | "preparing" | "completed" | "cancelled";
-  orderItems: OrderItem[];
+  orderItems: InnerOrderItem[];
   createdAt: string;
-}
+  __v: number;
+};
 
-// type InnerOrderItem = {
-//   _id: string;
-//   menuItem: {
-//     _id: string;
-//     name: string;
-//   };
-//   quantity: number;
-//   note?: string;
-// };
+type Reservation = {
+  _id: string;
+  reservationDateTime: string;
+  user: {
+    _id: string;
+    email: string;
+    name?: string;
+  };
+  restaurant: {
+    _id: string;
+    name: string;
+    address: string;
+    tel: string;
+    id: string;
+  };
+  status: "pending" | "confirmed" | "cancelled";
+  createdAt: string;
+  __v: number;
+  orderItems?: OrderItem[];
+  id: string;
+};
 
-// type OrderItem = {
-//   _id: string;
-//   reservation: string;
-//   restaurant: string;
-//   checkInStatus: boolean;
-//   checkInTime: string | null;
-//   totalPrice: number;
-//   phoneNumber: string;
-//   status: "pending" | "preparing" | "completed" | "cancelled";
-//   orderItems: InnerOrderItem[];
-//   createdAt: string;
-//   __v: number;
-// };
-
-// type Reservation = {
-//   _id: string;
-//   reservationDateTime: string;
-//   user: {
-//     _id: string;
-//     email: string;
-//     name?: string;
-//   };
-//   restaurant: {
-//     _id: string;
-//     name: string;
-//     address: string;
-//     tel: string;
-//     id: string;
-//   };
-//   status: "pending" | "confirmed" | "cancelled";
-//   createdAt: string;
-//   __v: number;
-//   orderItems?: OrderItem[];
-//   id: string;
-// };
+// Define workflow order
+const ORDER_STATES = ["pending", "preparing", "completed"];
 
 export default function ManagerPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const [deletedOrderIds, setDeletedOrderIds] = useState<string[]>([]);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
 
   const fetchReservations = async () => {
     if (session?.user?.token) {
@@ -113,9 +73,14 @@ export default function ManagerPage() {
       try {
         const bookings = await getReserves(session.user.token as string);
         setReservations(bookings.data);
+        
+        // Extract restaurant ID from the first reservation if available
+        if (bookings.data.length > 0 && bookings.data[0].restaurant?._id) {
+          setRestaurantId(bookings.data[0].restaurant._id);
+        }
       } catch (error: any) {
         console.error("Failed to fetch reservations:", error.message);
-        setError("ไม่สามารถดึงข้อมูลการจองได้ กรุณาลองใหม่อีกครั้ง");
+        setError("Unable to retrieve reservations data, please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -126,8 +91,9 @@ export default function ManagerPage() {
     fetchReservations();
   }, [session?.user?.token]);
 
-  const onDragStart = (e: React.DragEvent<HTMLDivElement>, orderItemId: string) => {
+  const onDragStart = (e: React.DragEvent<HTMLDivElement>, orderItemId: string, currentStatus: string) => {
     e.dataTransfer.setData("text/plain", orderItemId);
+    e.dataTransfer.setData("currentStatus", currentStatus);
   };
 
   const onDrop = async (
@@ -136,54 +102,71 @@ export default function ManagerPage() {
   ) => {
     e.preventDefault();
     const orderItemId = e.dataTransfer.getData("text/plain");
+    const currentStatus = e.dataTransfer.getData("currentStatus");
     
     if (!session?.user?.token) {
-      setError("คุณไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
+      setError("You are not logged in. Please log in again.");
       return;
     }
     
-    if (newStatus === "completed") {
-      console.log("delete from drag");
-      setDeletedOrderIds((prev) => [...prev, orderItemId]);
+    // Prevent backward movement in workflow
+    const currentIndex = ORDER_STATES.indexOf(currentStatus);
+    const newIndex = ORDER_STATES.indexOf(newStatus);
+    
+    if (newIndex < currentIndex) {
+      setError("Unable to move the order back to its previous status");
+      return;
     }
-
-    // Optimistic update - update UI immediately
-    setReservations((prev) =>
-      prev.map((reservation) => ({
-        ...reservation,
-        orderItems: reservation.orderItems?.map((order) =>
-          order._id === orderItemId ? { ...order, status: newStatus } as OrdersItem : order
-        ),
-      }))
-    );
     
     // Update on the server
     try {
       await updateOrderStatus(orderItemId, newStatus, session.user.token);
       console.log(`Updated order item ${orderItemId} to status: ${newStatus}`);
       
-      // Refresh data to ensure we have the latest state
-      fetchReservations();
+      // If moving to completed, remove from UI
+      if (newStatus === "completed") {
+        // Refresh the entire data
+        fetchReservations();
+      } else {
+        // For other statuses, update UI optimistically
+        setReservations((prev) =>
+          prev.map((reservation) => ({
+            ...reservation,
+            orderItems: reservation.orderItems?.map((order) =>
+              order._id === orderItemId ? { ...order, status: newStatus } as OrderItem : order
+            ),
+          }))
+        );
+      }
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
-      setError("ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้ง");
+      setError("Failed to update order status. Please try again");
       
       // Revert optimistic update if API call fails
       fetchReservations();
     }
   };
 
-  const allowDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const allowDrop = (e: React.DragEvent<HTMLDivElement>, targetStatus: string) => {
+    // Get the current status from dataTransfer
+    const currentStatus = e.dataTransfer.getData("currentStatus");
+    
+    // Only allow drop if it's a forward movement in the workflow
+    const currentIndex = ORDER_STATES.indexOf(currentStatus);
+    const targetIndex = ORDER_STATES.indexOf(targetStatus);
+    
+    if (currentIndex < targetIndex || currentStatus === "") {
+      e.preventDefault(); // Allow the drop
+    }
   };
 
-  const handleCardClick = async (orderItemId: string, currentStatus: OrdersItem["status"]) => {
+  const handleCardClick = async (orderItemId: string, currentStatus: OrderItem["status"]) => {
     if (!session?.user?.token) {
-      setError("คุณไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบใหม่");
+      setError("You are not logged in. Please log in again.");
       return;
     }
     
-    let nextStatus: OrdersItem["status"] = "pending";
+    let nextStatus: OrderItem["status"] = "pending";
     
     // Determine next status based on current status
     if (currentStatus === "pending") {
@@ -194,75 +177,72 @@ export default function ManagerPage() {
       // No change if already completed
       return;
     }
-
-    if (nextStatus === "completed") {
-      console.log("delete from click");
-      setDeletedOrderIds((prev) => [...prev, orderItemId]);
-    }
-    
-    // Optimistic update
-    setReservations((prev) =>
-      prev.map((reservation) => ({
-        ...reservation,
-        orderItems: reservation.orderItems?.map((order) =>
-          order._id === orderItemId ? { ...order, status: nextStatus } as OrdersItem : order
-        ),
-      }))
-    );
     
     // Update on server
     try {
       await updateOrderStatus(orderItemId, nextStatus, session.user.token as string);
       console.log(`Clicked order item: ${orderItemId}, new status: ${nextStatus}`);
       
-      // Refresh data
-      fetchReservations();
+      // If moving to completed, remove from UI by refreshing data
+      if (nextStatus === "completed") {
+        fetchReservations();
+      } else {
+        // For other statuses, update UI optimistically
+        setReservations((prev) =>
+          prev.map((reservation) => ({
+            ...reservation,
+            orderItems: reservation.orderItems?.map((order) =>
+              order._id === orderItemId ? { ...order, status: nextStatus } as OrderItem : order
+            ),
+          }))
+        );
+      }
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
-      setError("ไม่สามารถอัปเดตสถานะได้ กรุณาลองใหม่อีกครั้ง");
+      setError("Failed to update order status. Please try again");
       
       // Revert optimistic update
       fetchReservations();
     }
   };
 
-  const renderColumn = (status: "pending" | "preparing" | "completed") => {
-    // Map the status to display text
-    const statusText = {
-      pending: "PENDING",
-      preparing: "PREPARING",
-      completed: "COMPLETE"
+  const renderColumn = (status: "pending" | "preparing") => {
+    // Map the status to display text and icon
+    const statusInfo = {
+      pending: { text: "PENDING", icon: <Clock size={20} /> },
+      preparing: { text: "PREPARING", icon: <Coffee size={20} /> },
     };
 
     return (
       <div
         className={styles.column}
         onDrop={(e) => onDrop(e, status)}
-        onDragOver={allowDrop}
+        onDragOver={(e) => allowDrop(e, status)}
       >
-        <h2 className={styles.heading}>{statusText[status]}</h2>
+        <h2 className={styles.heading}>
+          {statusInfo[status].icon} {statusInfo[status].text}
+        </h2>
         {reservations
           .flatMap((reservation) =>
             reservation.orderItems
-              ?.filter((order) => order.status === status /*&& !deletedOrderIds.includes(order._id)*/)
+              ?.filter((order) => order.status === status)
               .map((orderItem) => (
                 <div
                   key={orderItem._id}
                   className={styles.card}
                   draggable
-                  onDragStart={(e) => onDragStart(e, orderItem._id)}
+                  onDragStart={(e) => onDragStart(e, orderItem._id, orderItem.status)}
                   onClick={() => handleCardClick(orderItem._id, orderItem.status)}
-                  
                 >
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
-                      {item.menuItem.name} x {item.quantity}
-                      {item.note && ` (หมายเหตุ: ${item.note})`}
+                      {item.menuName} <div>(หมายเหตุ: {item.note || '-'} )
+                       x {item.quantity}</div>
                     </div>
                   ))}
-                  <p>ออเดอร์โดย: {reservation.user.email || "ไม่ระบุอีเมล"}</p>
-                  <p>เบอร์โทร: {orderItem.phoneNumber}</p>
-                  <p>รวม: {orderItem.totalPrice} บาท</p>
+                  <p>Order by: {orderItem.emailUser || "ไม่ระบุอีเมล"}</p>
+                  <p>Tel: {orderItem.phoneNumber}</p>
+                  <p>Total: {orderItem.totalPrice} Baht</p>
                 </div>
               )) || []
           )}
@@ -270,10 +250,28 @@ export default function ManagerPage() {
     );
   };
 
+  // Special column for Complete that only catches drops
+  const renderCompleteColumn = () => {
+    return (
+      <div
+        className={`${styles.column} ${styles.completeColumn}`}
+        onDrop={(e) => onDrop(e, "completed")}
+        onDragOver={(e) => allowDrop(e, "completed")}
+      >
+        <h2 className={styles.heading}>
+          <CheckCircle size={20} /> COMPLETE
+        </h2>
+        <div className={styles.dropHere}>
+          Drag order here to set status to be Complete
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <div className={styles.header}>
-        Order List
+        <ClipboardList size={28} /> Order List
         {isLoading && <span className={styles.loading}> Loading...</span>}
       </div>
       
@@ -287,9 +285,13 @@ export default function ManagerPage() {
       <div className={styles.board}>
         {renderColumn("pending")}
         {renderColumn("preparing")}
-        {renderColumn("completed")}
+        {renderCompleteColumn()}
       </div>
-      <MenuOrdered />
+      
+      {/* Wrap MenuOrdered in a div with menuSection class */}
+      <div className={styles.menuSection}>
+        {restaurantId && <MenuOrdered restaurantId={restaurantId} />}
+      </div>
     </div>
   );
 }
