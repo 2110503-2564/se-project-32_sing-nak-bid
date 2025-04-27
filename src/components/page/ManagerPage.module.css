@@ -95,3 +95,21 @@
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
+
+
+.completeColumn {
+  background-color: #f0f8f0; /* สีพื้นหลังเขียวอ่อนๆ เพื่อแสดงว่าเป็นพื้นที่เสร็จสิ้น */
+}
+
+.dropHere {
+  height: 100px;
+  margin: 20px 0;
+  border: 2px dashed #aaa;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  text-align: center;
+  padding: 20px;
+}

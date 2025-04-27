@@ -1,49 +1,72 @@
 "use client";
+import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import styles from "./MenuOrdered.module.css";
 import { MenuItemOrdered } from "../../interfaces";
-import getMenuOrdered from "@/libs/getMenuOrdered";
-
-interface MenuItem {
-  _id: string;
-  name: string;
-  price: number;
-  orderCount: number;
-  recommended: boolean;
-}
+import getMenus from "@/libs/getMenus";
 
 interface MenuOrderedProps {
   restaurantId?: string;
 }
 
 export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
+  const params = useParams();
   const [menuItems, setMenuItems] = useState<MenuItemOrdered[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
-      if (!restaurantId) return;
+      // Try to get restaurant ID from props first, then from params
+      const idToUse = restaurantId || (params?.id && typeof params.id === "string" ? params.id : null);
+      
+      if (!idToUse) {
+        setError("ไม่พบ ID ร้านอาหาร");
+        setLoading(false);
+        return;
+      }
       
       setLoading(true);
+      setError(null);
+      
       try {
-        // Replace with your actual API endpoint
-        const response = await fetch(`/api/restaurants/${restaurantId}/menu-items`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch menu items');
+        // เรียกใช้ getMenus และรับข้อมูล
+        const response = await getMenus(idToUse);
+        
+        // ตรวจสอบโครงสร้างข้อมูลและแปลงให้เป็น array ที่ถูกต้อง
+        console.log("API Response:", response); // แสดง log เพื่อดูโครงสร้างข้อมูล
+        
+        let items: MenuItemOrdered[] = [];
+        
+        // ตรวจสอบว่าข้อมูลมีโครงสร้างแบบไหน
+        if (Array.isArray(response)) {
+          items = response;
+        } else if (response && typeof response === 'object') {
+          // ลองตรวจสอบว่ามี data field หรือไม่
+          if (Array.isArray(response.data)) {
+            items = response.data;
+          } else if (response.menus && Array.isArray(response.menus)) {
+            items = response.menus;
+          } else {
+            // หากไม่พบรูปแบบที่รู้จัก ให้ลองแปลงเป็น array
+            const possibleItems = Object.values(response).find(val => Array.isArray(val));
+            if (possibleItems) {
+              items = possibleItems as MenuItemOrdered[];
+            }
+          }
         }
-        const data = await response.json();
-        setMenuItems(data.data || []);
+        
+        setMenuItems(items);
       } catch (err) {
         console.error('Error fetching menu items:', err);
-        setError('Failed to load menu items');
+        setError('ไม่สามารถโหลดรายการเมนูได้');
       } finally {
         setLoading(false);
       }
     };
 
     fetchMenuItems();
-  }, [restaurantId]);
+  }, [restaurantId, params?.id]);
 
   const toggleRecommended = async (itemId: string) => {
     try {
@@ -88,16 +111,19 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
   };
 
   if (loading) {
-    return <div className={styles.loading}>Loading menu...</div>;
+    return <div className={styles.loading}>Loading Menu...</div>;
   }
 
   if (error) {
     return <div className={styles.error}>{error}</div>;
   }
 
-  if (menuItems.length === 0) {
-    return <div className={styles.empty}>No menu found.</div>;
+  if (!menuItems || menuItems.length === 0) {
+    return <div className={styles.empty}>Menu Not Found</div>;
   }
+
+  // สร้าง sorted array แยกออกมา
+  const sortedMenuItems = [...menuItems].sort((a, b) => b.orderCount - a.orderCount);
 
   return (
     <div className={styles.container}>
@@ -106,31 +132,29 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
         <table className={styles.table}>
           <thead>
             <tr>
-              <th className={styles.nameHeader}>Menu Item</th>
-              <th className={styles.countHeader}>count</th>
+              <th className={styles.nameHeader}>Menu name</th>
+              <th className={styles.countHeader}>Order quantity</th>
               <th className={styles.recommendHeader}>
-                make<br/>recommended
+              Set as Recommended menu
               </th>
             </tr>
           </thead>
           <tbody>
-            {menuItems
-              .sort((a, b) => b.orderCount - a.orderCount)
-              .map((item) => (
-                <tr key={item._id} className={styles.tableRow}>
-                  <td className={styles.itemName}>
-                    {item.name} ฿{item.price.toFixed(2)}
-                  </td>
-                  <td className={styles.count}>{item.orderCount}</td>
-                  <td className={styles.checkboxCell}>
-                    <input 
-                      type="checkbox" 
-                      checked={item.recommended}
-                      onChange={() => toggleRecommended(item._id)}
-                      className={styles.checkbox}
-                    />
-                  </td>
-                </tr>
+            {sortedMenuItems.map((item) => (
+              <tr key={item._id} className={styles.tableRow}>
+                <td className={styles.itemName}>
+                  {item.name} ฿{item.price.toFixed(2)}
+                </td>
+                <td className={styles.count}>{item.orderCount}</td>
+                <td className={styles.checkboxCell}>
+                  <input 
+                    type="checkbox" 
+                    checked={item.recommended}
+                    onChange={() => toggleRecommended(item._id)}
+                    className={styles.checkbox}
+                  />
+                </td>
+              </tr>
             ))}
           </tbody>
         </table>
