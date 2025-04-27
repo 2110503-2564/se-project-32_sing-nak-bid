@@ -5,24 +5,34 @@
   padding: 30px; 
   background-color: #fffff5;
   border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(78, 69, 35, 0.578);
-  display: grid; 
-  grid-template-columns: 1fr 1fr; 
+  box-shadow: 0 4px 8px rgba(78, 69, 35, 0.578); 
   gap: 20px; 
+  display: flex;
+  flex-direction: column; /* Arrange the elements vertically */
+  align-items: center;    /* Center the items horizontally */
+  justify-content: center; /* Center the items vertically */
+  text-align: center;
 
 }
 
 .header {
   text-align: center;
   font-size: 35px;
-  margin-bottom: 20px; 
-  grid-column: 1 / span 2; 
+  margin-bottom: 20px;
   color: #aa2b08;
   font-weight: bold;
 }
 
 
+.form {
+  width: 100%; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .formGroup {
+  width: 100%;
   margin-bottom: 15px;
 }
 
@@ -44,6 +54,8 @@
   width: 100%;
   box-sizing: border-box;   
   outline: 1px solid #201335;
+  display: block;
+  
 }
 
 .rating {
@@ -66,6 +78,7 @@
 .textarea {
   resize: vertical;
   min-height: 80px; 
+  
 }
 
 .buttonContainer {

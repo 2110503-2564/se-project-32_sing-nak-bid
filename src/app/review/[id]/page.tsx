@@ -37,6 +37,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
   return (
     <div className={styles.container}>
     <img src="/img/Food4.png" alt={`${restaurant.name} picture`} className={styles.restaurantImage} />
+      <div className='flex flex-col items-center justify-center'>
       <h1 className={styles.header}>Review {restaurant.name} Restaurant</h1>
 
       <form onSubmit={handleSubmit} className={styles.form}>
@@ -77,8 +78,11 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
             className={styles.textarea}
           />
         </div>
-        <button type="submit" disabled={isSubmitting} className={styles.submitButton}>Post Review</button>
+        
+        
       </form>
+      <button type="submit" disabled={isSubmitting} className={styles.submitButton}>Post Review</button>
+      </div>
     </div>
   );
 }
