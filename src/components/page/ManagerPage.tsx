@@ -236,7 +236,7 @@ export default function ManagerPage() {
                 >
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
-                      {item.menuName} <div>(หมายเหตุ: {item.note} )
+                      {item.menuName} <div>(หมายเหตุ: {item.note || '-'} )
                        x {item.quantity}</div>
                     </div>
                   ))}
