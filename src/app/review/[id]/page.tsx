@@ -77,7 +77,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
             className={styles.textarea}
           />
         </div>
-        <button type="submit" disabled={isSubmitting} className={styles.submitButton}> Submit Review</button>
+        <button type="submit" disabled={isSubmitting} className={styles.submitButton}>Post Review</button>
       </form>
     </div>
   );
