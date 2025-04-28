@@ -8,12 +8,14 @@ import updateOrderStatus from "@/libs/updateOrderStatus";
 import Link from "next/link";
 // Import icons
 import { ClipboardList, Clock, CheckCircle, Coffee, DollarSign, Star } from "lucide-react";
+import updateMenu from "@/libs/updateMenu";
 
 type InnerOrderItem = {
   _id: string;
   menuItem: {
     _id: string;
     name: string;
+    orderCount: number;
   };
   menuName: string;
   quantity: number;
@@ -65,7 +67,7 @@ export default function ManagerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [restaurantId, setRestaurantId] = useState<string>('');
   const [showRevenue, setShowRevenue] = useState(false);
   const [totalRevenue, setTotalRevenue] = useState(0);
 
@@ -133,6 +135,20 @@ export default function ManagerPage() {
     try {
       await updateOrderStatus(orderItemId, newStatus, session.user.token);
       console.log(`Updated order item ${orderItemId} to status: ${newStatus}`);
+
+      if (newStatus === "completed") {
+        const completedOrder = reservations
+          .flatMap(reservation => reservation.orderItems || [])
+          .find(order => order._id === orderItemId);
+  
+        if (completedOrder) {
+          completedOrder.orderItems.forEach(async menuItem => {
+            console.log(` menuItem: ${menuItem.menuItem}, quan+orderCount: ${menuItem.quantity}+${menuItem.menuItem.orderCount}`);
+            await updateMenu(session.user.token, restaurantId, menuItem.menuItem._id, menuItem.quantity+menuItem.menuItem.orderCount);
+            
+          });
+        }
+      }
       
       // If moving to completed, refresh data to update revenue
       fetchReservations();
@@ -180,6 +196,19 @@ export default function ManagerPage() {
     try {
       await updateOrderStatus(orderItemId, nextStatus, session.user.token as string);
       console.log(`Clicked order item: ${orderItemId}, new status: ${nextStatus}`);
+
+      if (nextStatus === "completed") {
+        const completedOrder = reservations
+          .flatMap(reservation => reservation.orderItems || [])
+          .find(order => order._id === orderItemId);
+          
+        if (completedOrder) {
+          completedOrder.orderItems.forEach(async menuItem => {
+            console.log(` menuItem: ${menuItem.menuItem}, quan+orderCount: ${menuItem.quantity}+${menuItem.menuItem.orderCount}`);
+            await updateMenu(session.user.token, restaurantId, menuItem.menuItem._id, menuItem.quantity,); 
+          });
+        }
+      }
       
       // Refresh data to update revenue if moving to completed
       fetchReservations();
