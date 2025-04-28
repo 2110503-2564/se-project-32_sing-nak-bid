@@ -75,7 +75,9 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
       <div className="flex text-yellow-400">
         {[...Array(5)].map((_, i) => (
           <span key={i} className="text-xl">
-            {i < rating ? "★" : "☆"}
+            {i < Math.floor(rating) ? "★" : i < rating 
+              ? "⯪" // Use a half star character for partial ratings
+              : "☆"}
           </span>
         ))}
       </div>
