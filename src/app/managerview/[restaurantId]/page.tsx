@@ -4,20 +4,15 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { Filter } from 'lucide-react';
 import getRatings from '@/libs/getRatings';
-import styles from './ManagerReviewPage.module.css';
 import getRestaurant from '@/libs/getRestaurant';
 
 // Define types for restaurant reviews
 type Review = {
   _id: string;
-  user: {
-    name?: string;
-    email: string;
-  };
+  user: string;
   restaurant: string;
-  rating: number;
+  score: number;
   comment: string;
-  createdAt: string;
 };
 
 export default function ManagerReviewPage({ params }: { params: { restaurantId: string } }) {
@@ -45,6 +40,7 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
         
         // Fetch reviews for this restaurant
         const reviewsResponse = await getRatings(params.restaurantId);
+
         // Since you're using your custom functions, they might already return parsed JSON
         // Modify this part based on what your getRatings function returns
         setReviews(reviewsResponse.data || []);
@@ -65,7 +61,7 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
     if (selectedRating === null) {
       setFilteredReviews(reviews);
     } else {
-      setFilteredReviews(reviews.filter(review => review.rating === selectedRating));
+      setFilteredReviews(reviews.filter(review => review.score === selectedRating));
     }
   }, [selectedRating, reviews]);
 
@@ -87,7 +83,7 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
   };
 
   if (isLoading) {
-    return <div className="text-center py-10">กำลังโหลดรีวิว...</div>;
+    return <div className="text-center py-10">Loading Review...</div>;
   }
 
   if (error) {
@@ -98,7 +94,7 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
           onClick={() => window.location.reload()}
           className="ml-3 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
         >
-          ลองใหม่
+         Try again
         </button>
       </div>
     );
@@ -145,17 +141,16 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
           
           {filteredReviews.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              ไม่พบรีวิวที่ตรงกับเงื่อนไขที่เลือก
+              No reviews found that match your selection.
             </div>
           ) : (
             <div className="space-y-4">
               {filteredReviews.map(review => (
                 <div key={review._id} className="bg-white p-4 rounded-lg shadow">
-                  {renderStarRating(review.rating)}
+                  {renderStarRating(review.score)}
                   <p className="text-gray-700 mt-2">{review.comment}</p>
                   <div className="mt-2 text-sm text-gray-500">
-                    <p>โดย: {review.user?.name || review.user?.email || 'ผู้ใช้ไม่ระบุชื่อ'}</p>
-                    <p>เมื่อ: {new Date(review.createdAt).toLocaleDateString('th-TH')}</p>
+                    <p>By: {review.user}</p>
                   </div>
                 </div>
               ))}
