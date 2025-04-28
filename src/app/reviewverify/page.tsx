@@ -76,29 +76,40 @@ export default function ReviewVertifyPage() {
   }, [session?.user?.role]);
 
   const handleDeleteReview = async (restaurantId: string, reviewId: string) => {
-    try {
-      // Replace '/api/admin/reviews/' with your actual API endpoint for deleting reviews
-      const response = await fetch(`/api/admin/reviews/${reviewId}`, {
-        method: 'DELETE',
-      });
+    const restaurantToUpdate = restaurants.find(restaurant => restaurant._id === restaurantId);
 
-      if (response.ok) {
-        setRestaurants(prevRestaurants =>
-          prevRestaurants.map(restaurant =>
-            restaurant._id === restaurantId
-              ? { ...restaurant, ratings: restaurant.ratings?.filter(review => review._id !== reviewId) }
-              : restaurant
-          )
-        );
-        console.log(`Review ${reviewId} deleted successfully from restaurant ${restaurantId}.`);
-        // Optionally show a success message to the user
-      } else {
-        console.error('Failed to delete review:', response);
-        // Optionally show an error message to the user
+    if (restaurantToUpdate) {
+      const updatedRatings = restaurantToUpdate.ratings?.filter(review => review._id !== reviewId) || [];
+
+      try {
+        // Replace with your actual API endpoint for updating a restaurant
+        const response = await fetch(`http://localhost:5000/api/v1/restaurants/${restaurantId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            authorization: `Bearer ${session?.user.token}`,
+          },
+          body: JSON.stringify({ ratings: updatedRatings }),
+        });
+
+        if (response.ok) {
+          setRestaurants(prevRestaurants =>
+            prevRestaurants.map(restaurant =>
+              restaurant._id === restaurantId
+                ? { ...restaurant, ratings: updatedRatings }
+                : restaurant
+            )
+          );
+          console.log(`Review ${reviewId} virtually deleted by updating restaurant ${restaurantId}.`);
+          // Optionally show a success message.
+        } else {
+          console.error('Failed to update restaurant to delete review:', response);
+          // Optionally show an error message.
+        }
+      } catch (error: any) {
+        console.error('Error updating restaurant:', error);
+        // Optionally show an error message.
       }
-    } catch (error: any) {
-      console.error('Error deleting review:', error);
-      // Optionally show an error message to the user
     }
   };
 
