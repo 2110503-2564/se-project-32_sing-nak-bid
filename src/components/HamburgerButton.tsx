@@ -1,12 +1,15 @@
+// HamburgerButton.tsx
 "use client";
 import { useState, useEffect, useRef } from "react";
 import styles from "./Hamburger.module.css";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const hamburgerRef = useRef<HTMLButtonElement | null>(null);
+  const { data: session } = useSession();
 
   // Close the dropdown when clicked outside
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
           ref={dropdownRef}
           className="absolute w-64 overflow-y-auto bg-white border border-gray-200 shadow-lg"
         >
-          {/**Add Home */}
+          {/* Add Home */}
           <Link href="/" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</div>
           </Link>
@@ -68,6 +71,11 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
           <Link href="/reserve" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reserve</div>
           </Link>
+          {session?.user?.role === "admin" && (
+            <Link href="/reviewverify" onClick={() => setIsOpen(false)}>
+              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Review Verify</div>
+            </Link>
+          )}
         </div>
       )}
     </div>
