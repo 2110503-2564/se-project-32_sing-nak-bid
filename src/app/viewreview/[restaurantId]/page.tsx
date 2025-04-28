@@ -167,12 +167,12 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
     <div className="bg-amber-50 min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* ปุ่มย้อนกลับไปหน้า view review */}
-        <Link 
-          href="/restaurant"
+        <Link
+          href={`/restaurant/${params.restaurantId}`}
           className="inline-flex items-center text-amber-600 hover:text-amber-800 font-medium mb-4 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>กลับไป</span>
+          <span>กลับไปที่ร้านอาหาร</span>
         </Link>
 
         {restaurant && (
