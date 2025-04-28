@@ -62,19 +62,23 @@ export default function HamburgerButton({ onClick }: { onClick?: () => void }) {
           <Link href="/" onClick={() => setIsOpen(false)}>
             <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Home</div>
           </Link>
-          <Link href="/myreservation" onClick={() => setIsOpen(false)}>
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Reservation</div>
-          </Link>
-          <Link href="/myorder" onClick={() => setIsOpen(false)}>
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Order</div>
-          </Link>
-          <Link href="/reserve" onClick={() => setIsOpen(false)}>
-            <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reserve</div>
-          </Link>
-          {session?.user?.role === "admin" && (
-            <Link href="/reviewverify" onClick={() => setIsOpen(false)}>
-              <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Review Verify</div>
-            </Link>
+          {session?.user?.role !== "manager" && (
+            <>
+              <Link href="/myreservation" onClick={() => setIsOpen(false)}>
+                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Reservation</div>
+              </Link>
+              <Link href="/myorder" onClick={() => setIsOpen(false)}>
+                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">My Order</div>
+              </Link>
+              <Link href="/reserve" onClick={() => setIsOpen(false)}>
+                <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reserve</div>
+              </Link>
+              {session?.user?.role === "admin" && (
+                <Link href="/reviewverify" onClick={() => setIsOpen(false)}>
+                  <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Review Verify</div>
+                </Link>
+              )}
+            </>
           )}
         </div>
       )}
