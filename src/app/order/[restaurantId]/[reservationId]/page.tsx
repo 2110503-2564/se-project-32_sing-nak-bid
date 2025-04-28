@@ -571,7 +571,7 @@ const OrdersMenuPage = () => {
                   )}
                 </div>
               </div>
-              <div className="w-full flex justify-center mt-4">
+              <div className="w-full flex justify-center mb-5">
                 <button className={`group ${styles["button"]}`} onClick={() => handleClick(item)}>
                   <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
                     Add menu to your order

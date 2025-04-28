@@ -30,7 +30,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
     fetchRestaurant();
   }, [params.id]);
 
-  // Handle form submission // WIP from Markkongphop anyone can edit I need to do some other thing
+  // Handle form submission // WIP from Markkongphop anyone can edit I need to do some other thing ....... Chanunchita edit some more can look what i have edited from the comment 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true); // Set loading state
@@ -124,6 +124,6 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
       </form>
      
       </div>
-    </div>
+    </div>    
   );
 }
