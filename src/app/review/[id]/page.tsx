@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import getRestaurant from '@/libs/getRestaurant';
 import { Rating } from '@mui/material';
 import styles from './ReviewPage.module.css';
@@ -8,6 +9,7 @@ import { useSession } from 'next-auth/react';
 import addRating from '@/libs/addRating';
 
 export default function ReviewPage({ params }: { params: { id: string } }) {
+  const router = useRouter(); // add router for a button to navigate to restaurant page after click the button
   const { data: session } = useSession();
   const [restaurant, setRestaurant] = useState<any | null>(null);
   const [name, setName] = useState('');
@@ -29,28 +31,45 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
   }, [params.id]);
 
   // Handle form submission // WIP from Markkongphop anyone can edit I need to do some other thing
-  // const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   console.log("Session Token:", session?.user?.token);
-  //   console.log("Selected Restaurant ID:", restaurant.id);
-  //   console.log("Score:", rating);
-  //   console.log("Comment:", comment);
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true); // Set loading state
+    console.log("Session Token:", session?.user?.token);
+    console.log("Selected Restaurant ID:", restaurant.id);
+    console.log("Score:", rating);
+    console.log("Comment:", comment);
 
-  //   if (!session?.user?.token || !restaurant || !rating || !comment) {
-  //     alert("Please fill all field");
-  //     // setShowErrorAlert(true);
-  //     return;
-  //   }
-    
-  //   const success = await addRating(rating,comment,restaurant,session?.user?.token)
+    if (!session?.user?.token || !restaurant || !rating || !comment) {
+      alert("Please fill all field");
+      // setShowErrorAlert(true);
+      setIsSubmitting(false); //add setissubmitting to false
+      return;
+    }
+    //Add Try-catch error
+    try{
+      //change restaurant -> restaurant.id
+    const success = await addRating(rating,comment,restaurant.id,session?.user?.token)
 
-  //   if(success){
-  //     alert("Thank for review our Restaurant!");
-  //     alert(restaurant);
-  //     alert(rating);
-  //     alert(comment);
-  //   }
-  // };
+    if(success){
+      router.push(`/restaurant/${params.id}`)
+      alert("Thank for review our Restaurant!");
+      alert(restaurant.id);
+      alert(rating);
+      alert(comment);
+
+      // Reset form after Post a review
+      setRating(0);
+      setComment('');
+      setName('');
+
+    }
+  }catch (error) {
+    console.error("Error submitting review:", error);
+    alert("There was an error submitting your review. Please try again.");
+  } finally {
+    setIsSubmitting(false);
+  }
+  };
 
   if (!restaurant) {
     return <p>Loading restaurant details...</p>;
@@ -101,9 +120,9 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
           />
         </div>
         
-        
+        <button type="submit" disabled={isSubmitting} className={styles.submitButton}> {isSubmitting ? 'Submitting...' : 'Post Review'}</button>
       </form>
-      <button type="submit" disabled={isSubmitting} className={styles.submitButton}>Post Review</button>
+     
       </div>
     </div>
   );

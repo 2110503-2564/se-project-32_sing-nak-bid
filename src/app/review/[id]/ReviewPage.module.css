@@ -4,28 +4,41 @@
   margin: 50px auto 0;
   padding: 30px; 
   background-color: #fffff5;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(78, 69, 35, 0.578); 
-  gap: 20px; 
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(78, 69, 35, 0.2); 
   display: flex;
-  flex-direction: column; /* Arrange the elements vertically */
-  align-items: center;    /* Center the items horizontally */
-  justify-content: center; /* Center the items vertically */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-
+  position: relative;
+  overflow: hidden;
 }
 
 .header {
   text-align: center;
   font-size: 35px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   color: #aa2b08;
   font-weight: bold;
+  position: relative;
 }
 
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background-color: #aa2b08;
+  border-radius: 2px;
+}
 
 .form {
-  width: 100%; 
+  width: 100%;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,94 +46,184 @@
 
 .formGroup {
   width: 100%;
-  margin-bottom: 15px;
+  margin-bottom: 24px;
+  position: relative;
 }
 
 .label {
   font-size: 16px;
   font-weight: bold;
-  margin-bottom: 5px; 
+  margin-bottom: 8px; 
   display: block; 
   color: #201335;
-  
+  text-align: left;
+  transition: all 0.3s ease;
 }
 
 .input,
 .textarea {
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+  padding: 12px 16px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
   width: 100%;
   box-sizing: border-box;   
-  outline: 1px solid #201335;
-  display: block;
-  
+  background-color: rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: #aa2b08;
+  box-shadow: 0 0 0 3px rgba(170, 43, 8, 0.2);
+  outline: none;
 }
 
 .rating {
   margin-top: 10px;
   display: flex;
   align-items: center;
-}
-
-.star {
-  color: #aaa;
-  cursor: pointer;
-  font-size: 24px;
-  margin-right: 5px; 
-}
-
-.star.active {
-  color: #FFD700;
+  justify-content: flex-start;
+  width: 100%;
 }
 
 .textarea {
   resize: vertical;
-  min-height: 80px; 
-  
-}
-
-.buttonContainer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 20px; 
-  grid-column: 2 / 3; 
-  align-self: end; 
+  min-height: 120px; 
 }
 
 .submitButton {
-  padding: 10px 20px;
-  font-size: 16px; 
+  padding: 14px 28px;
+  font-size: 18px; 
   font-weight: bold;
   background-color: #ff5353;
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(255, 83, 83, 0.2);
+  width: 100%;
+  max-width: 300px;
 }
 
 .submitButton:hover {
   background-color: #ff8279;
-  box-shadow: 0 0 0 5px #ff6d6d5f;
-  color: #000000;
+  box-shadow: 0 0 0 5px rgba(255, 109, 109, 0.3);
+  transform: translateY(-2px);
+}
+
+.submitButton:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 3px rgba(255, 83, 83, 0.2);
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .restaurantImage {
-  background-color: #d9d9d9;
   width: 100%;
-  height: 150px; 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 15px;
-  border-radius: 4px;
-  grid-column: 1 / -1;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.restaurantImage::before {
-  content: "resImagejaaa"; 
+.ratingValue {
+  margin-left: 10px;
   font-size: 16px;
-  color: #777;
+  color: #666;
+}
+
+.reviewSection {
+  background-color: rgba(255, 255, 245, 0.5);
+  border-radius: 10px;
+  padding: 30px;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: inset 0 0 10px rgba(78, 69, 35, 0.1);
+}
+
+/* Add responsive styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+    margin-top: 30px;
+  }
+  
+  .header {
+    font-size: 28px;
+  }
+  
+  .submitButton {
+    padding: 12px 24px;
+    font-size: 16px;
+  }
+  
+  .restaurantImage {
+    height: 200px;
+  }
+}
+
+/* Add animation for form elements */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.formGroup {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.formGroup:nth-child(1) { animation-delay: 0.1s; }
+.formGroup:nth-child(2) { animation-delay: 0.2s; }
+.formGroup:nth-child(3) { animation-delay: 0.3s; }
+.formGroup:nth-child(4) { animation-delay: 0.4s; }
+
+/* Loading state for the submit button */
+.loadingSpinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Focus styles for better accessibility */
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: 2px solid #aa2b08;
+  outline-offset: 2px;
+}
+
+/* Add a nicer style for the stars */
+.star {
+  font-size: 28px;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.star.active {
+  color: #FFD700;
 }
