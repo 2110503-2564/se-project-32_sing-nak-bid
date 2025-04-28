@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
-import { Filter } from 'lucide-react';
+import { Filter, Star, StarHalf, ChevronDown, ArrowLeft } from 'lucide-react';
 import getRatings from '@/libs/getRatings';
 import getRestaurant from '@/libs/getRestaurant';
+import Link from 'next/link';
+import styles from './ManagerReviewPage.module.css';
 
 // Define types for restaurant reviews
 type Review = {
@@ -40,9 +42,6 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
         
         // Fetch reviews for this restaurant
         const reviewsResponse = await getRatings(params.restaurantId);
-
-        // Since you're using your custom functions, they might already return parsed JSON
-        // Modify this part based on what your getRatings function returns
         setReviews(reviewsResponse.data || []);
         setFilteredReviews(reviewsResponse.data || []);
       } catch (error: any) {
@@ -72,12 +71,16 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
 
   const renderStarRating = (rating: number) => {
     return (
-      <div className="flex text-yellow-400">
+      <div className={styles.starRating}>
         {[...Array(5)].map((_, i) => (
-          <span key={i} className="text-xl">
-            {i < Math.floor(rating) ? "★" : i < rating 
-              ? "⯪" // Use a half star character for partial ratings
-              : "☆"}
+          <span key={i}>
+            {i < Math.floor(rating) ? (
+              <Star className={styles.starFilled} />
+            ) : i < rating ? (
+              <StarHalf className={styles.starHalf} />
+            ) : (
+              <Star className={styles.starEmpty} />
+            )}
           </span>
         ))}
       </div>
@@ -85,43 +88,82 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
   };
 
   if (isLoading) {
-    return <div className="text-center py-10">Loading Review...</div>;
-  }
-
-  if (error) {
     return (
-      <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-4">
-        {error}
-        <button 
-          onClick={() => window.location.reload()}
-          className="ml-3 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-        >
-         Try again
-        </button>
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingCard}>
+          <div className={styles.loadingSpinner}></div>
+          <p className={styles.loadingText}>Loading Reviews...</p>
+        </div>
       </div>
     );
   }
 
+  if (error) {
+    return (
+      <div className={styles.pageContainer}>
+        <div className={styles.errorCard}>
+          <div className={styles.errorMessage}>
+            {error}
+            <button 
+              onClick={() => window.location.reload()}
+              className={styles.retryButton}
+            >
+             Try again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const getAverageRating = () => {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((acc, review) => acc + review.score, 0);
+    return (sum / reviews.length).toFixed(1);
+  };
+
   return (
-    <div className="bg-amber-50 min-h-screen p-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-amber-100 rounded-lg p-6 shadow">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold text-gray-800">Customer Review</h1>
-            <div className="relative">
+    <div className={styles.pageContainer}>
+      {/* Header */}
+      <div className={styles.headerContainer}>
+        <div className={styles.headerContent}>
+          <Link href={`/`} className={styles.backButton}>
+            <ArrowLeft />
+          </Link>
+          <h1 className={styles.headerTitle}>
+            {restaurant?.name || 'Restaurant'} Reviews
+          </h1>
+        </div>
+      </div>
+      
+      {/* Main Content */}
+      <div className={styles.mainContent}>
+        {/* Summary Card */}
+        <div className={styles.summaryCard}>
+          <div className={styles.summaryHeader}>
+            <div>
+              <h2 className={styles.summaryTitle}>Review Summary</h2>
+              <div className={styles.ratingOverview}>
+                <span className={styles.averageScore}>{getAverageRating()}</span>
+                {renderStarRating(parseFloat(getAverageRating()))}
+                <span className={styles.reviewCount}>({reviews.length} reviews)</span>
+              </div>
+            </div>
+            
+            <div className={styles.filterContainer}>
               <button 
                 onClick={() => setShowFilterMenu(!showFilterMenu)}
-                className="bg-yellow-400 py-1 px-4 rounded flex items-center space-x-2"
+                className={styles.filterButton}
               >
-                <span>SORT</span>
-                <Filter size={16} />
+                <span>{selectedRating === null ? 'Filter Reviews' : `${selectedRating} Star Reviews`}</span>
+                <ChevronDown size={16} />
               </button>
               
               {showFilterMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                <div className={styles.filterMenu}>
                   <ul>
                     <li 
-                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                      className={styles.filterMenuItem}
                       onClick={() => handleFilterClick(null)}
                     >
                       All Reviews
@@ -129,9 +171,10 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
                     {[5, 4, 3, 2, 1].map(rating => (
                       <li 
                         key={rating}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center"
+                        className={styles.filterMenuRating}
                         onClick={() => handleFilterClick(rating)}
                       >
+                        <span>{rating} Star</span>
                         {renderStarRating(rating)}
                       </li>
                     ))}
@@ -140,25 +183,53 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
               )}
             </div>
           </div>
-          
-          {filteredReviews.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No reviews found that match your selection.
+        </div>
+        
+        {/* Reviews List */}
+        {filteredReviews.length === 0 ? (
+          <div className={styles.emptyState}>
+            <div className={styles.emptyStateIcon}>
+              <Star />
             </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredReviews.map(review => (
-                <div key={review._id} className="bg-white p-4 rounded-lg shadow">
-                  {renderStarRating(review.score)}
-                  <p className="text-gray-700 mt-2">{review.comment}</p>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <p>By: {review.user}</p>
+            <h3 className={styles.emptyStateTitle}>No reviews found</h3>
+            <p className={styles.emptyStateText}>
+              {selectedRating === null
+                ? "This restaurant hasn't received any reviews yet."
+                : `No ${selectedRating}-star reviews available.`}
+            </p>
+          </div>
+        ) : (
+          <div className={styles.reviewsList}>
+            {filteredReviews.map(review => (
+              <div key={review._id} className={styles.reviewCard}>
+                <div className={styles.reviewHeader}>
+                  <div>
+                    <div className={styles.reviewRating}>
+                      {renderStarRating(review.score)}
+                      <span className={styles.ratingText}>
+                        {review.score === 5 ? "Excellent" : 
+                         review.score === 4 ? "Very Good" : 
+                         review.score === 3 ? "Good" : 
+                         review.score === 2 ? "Fair" : "Poor"}
+                      </span>
+                    </div>
+                    <p className={styles.reviewerName}>
+                      {review.user ? review.user.split('@')[0] : 'Anonymous'}
+                    </p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className={styles.reviewContent}>
+                  <p>{review.comment || "No comment provided."}</p>
+                </div>
+                <div className={styles.reviewFooter}>
+                  <div className={styles.reviewerId}>
+                    Customer ID: {review.user.substring(0, 8)}...
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
