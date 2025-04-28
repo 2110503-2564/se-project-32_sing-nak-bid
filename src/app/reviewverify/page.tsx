@@ -56,7 +56,9 @@ export default function ReviewVertifyPage() {
 
       try {
         // Replace '/api/admin/restaurants-with-all-data' with your actual API endpoint
-        const response = await fetch('http://localhost:5000/api/v1/restaurants/${id}');
+        const response = await fetch('http://localhost:5000/api/v1/restaurants',{
+          method: "GET",
+        });
         if (!response.ok) {
           const message = `An error occurred: ${response.status}`;
           throw new Error(message);
