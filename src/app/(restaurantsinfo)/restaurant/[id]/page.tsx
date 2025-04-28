@@ -261,6 +261,19 @@ const RestaurantDetailPage = () => {
                 </span>
               </button>
               </div>
+              <div className="mx-1"> 
+              <button
+                className={`group ${styles["button"]}`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/viewreview/${restaurant._id}`);
+                }}
+              >
+                <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                  View review
+                </span>
+              </button>
+              </div>
             </div>
           </div>
           <div className="flex-shrink-0 ml-4">

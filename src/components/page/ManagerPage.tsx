@@ -306,7 +306,7 @@ export default function ManagerPage() {
       {/* View Reviews Button */}
       {restaurantId && (
         <div className={styles.reviewButtonContainer}>
-          <Link href={`/reviews/${restaurantId}`} passHref>
+          <Link href={`/managerview/${restaurantId}`} passHref>
             <div className={styles.reviewButton}>
               <Star size={20} /> View Reviews
             </div>
