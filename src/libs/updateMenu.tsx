@@ -2,7 +2,7 @@ export default async function updateMenu(
     token: string,
     restaurantId: string,
     menuId:string,
-    orderCount:Number //= old orderCount + new orderCount 
+    orderCount:number //= old orderCount + new orderCount 
   ) {
     const response = await fetch(
       `http://localhost:5000/api/v1/restaurants/${restaurantId}/menu/${menuId}`,
@@ -20,7 +20,7 @@ export default async function updateMenu(
   
     if (!response.ok) {
       console.log(await response.json()); 
-      throw new Error("Failed to update rating");
+      throw new Error("Failed to update menu");
     }
   
     return await response.json();

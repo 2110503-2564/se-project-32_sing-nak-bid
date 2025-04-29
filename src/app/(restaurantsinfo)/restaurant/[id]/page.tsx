@@ -5,6 +5,7 @@ import getRestaurant from "@/libs/getRestaurant"; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
 import styles from "../../../../components/Button.module.css";
 import Rating from "@mui/material/Rating";
+import RecommendedMenu from "@/components/RecommendedMenu"; // Import the RecommendedMenu component
 
 interface RestaurantDetail {
   _id: string;
@@ -21,6 +22,8 @@ interface MenuItem {
   name: string;
   price: number;
   description: string;
+  recommended?: boolean; // Add recommended property
+  orderCount?: number; // Add orderCount property
   allergens?: Allergen[];
 }
 
@@ -42,6 +45,7 @@ const RestaurantDetailPage = () => {
   const [filteredMenuItems, setFilteredMenuItems] = useState<
     MenuItem[] | undefined
   >(restaurant?.menuItems);
+  const [recommendedMenuItems, setRecommendedMenuItems] = useState<MenuItem[]>([]);
   const filterDropdownRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -73,7 +77,11 @@ const RestaurantDetailPage = () => {
   useEffect(() => {
     if (restaurant?.menuItems) {
       const allRestaurantAllergens = new Set<string>();
-      restaurant.menuItems.forEach((item) => {
+      const deduplicatedItems = Array.from(
+        new Map(restaurant.menuItems.map(item => [item._id, item])).values()
+      );
+
+      deduplicatedItems.forEach((item) => {
         item.allergens?.forEach((allergen) => {
           if (Array.isArray(allergen.name)) {
             allergen.name.forEach((n) => allRestaurantAllergens.add(n));
@@ -85,14 +93,25 @@ const RestaurantDetailPage = () => {
         });
       });
       setAllergens(Array.from(allRestaurantAllergens));
-      setFilteredMenuItems(restaurant.menuItems);
+
+      // Initial filter for recommended items
+      const initialRecommended = deduplicatedItems.filter(
+        (item) => item.recommended === true
+      );
+      setRecommendedMenuItems(initialRecommended);
+      setFilteredMenuItems(deduplicatedItems);
     }
   }, [restaurant?.menuItems]);
 
   useEffect(() => {
     if (restaurant?.menuItems) {
+      let filteredItems = restaurant.menuItems;
+      let filteredRecommendedItems = restaurant.menuItems.filter(
+        (item) => item.recommended === true
+      );
+
       if (selectedAllergens.length > 0) {
-        const newFilteredItems = restaurant.menuItems.filter((item) => {
+        filteredItems = filteredItems.filter((item) => {
           if (!item.allergens || item.allergens.length === 0) {
             return true;
           }
@@ -112,10 +131,40 @@ const RestaurantDetailPage = () => {
             }
           });
         });
-        setFilteredMenuItems(newFilteredItems);
-      } else {
-        setFilteredMenuItems(restaurant.menuItems);
+
+        filteredRecommendedItems = filteredRecommendedItems.filter((item) => {
+          if (!item.allergens || item.allergens.length === 0) {
+            return true;
+          }
+          return !item.allergens.some((allergen) => {
+            if (allergen.name && Array.isArray(allergen.name)) {
+              return allergen.name.some((name) =>
+                selectedAllergens.includes(name)
+              );
+            } else if (allergen.name && typeof allergen.name === "string") {
+              return selectedAllergens.includes(allergen.name);
+            } else {
+              console.warn(
+                "Unexpected allergen name format for some:",
+                allergen.name
+              );
+              return false;
+            }
+          });
+        });
       }
+
+      const deduplicateFilteredItems = Array.from(
+        new Map(filteredItems.map((item) => [item._id, item])).values()
+      );
+
+      // Deduplicate recommended items based on _id
+      const uniqueRecommendedItems = Array.from(
+        new Map(filteredRecommendedItems.map((item) => [item._id, item])).values()
+      );
+
+      setFilteredMenuItems(deduplicateFilteredItems);
+      setRecommendedMenuItems(uniqueRecommendedItems);
     }
   }, [selectedAllergens, restaurant?.menuItems]);
 
@@ -185,8 +234,6 @@ const RestaurantDetailPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8">
-      {" "}
-      {/* Removed -my-3 and added py-8 */}
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
         <img
           src="/img/food3.jpg"
@@ -212,28 +259,23 @@ const RestaurantDetailPage = () => {
                 </span>
               </div>
             </div>
-            {/* Red text */}
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Address:</span>{" "}
               {restaurant.address}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Tel:</span>{" "}
               {restaurant.tel}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Open Time:</span>{" "}
               {restaurant.opentime}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700">
               <span className="font-semibold text-red-500">Close Time:</span>{" "}
               {restaurant.closetime}
-            </p>{" "}
-            {/* Red accent */}
-            <div className="w-full flex  mt-4">
+            </p>
+            <div className="w-full flex mt-4">
               <button
                 className={`group ${styles["button"]}`}
                 onClick={(e) => {
@@ -246,33 +288,31 @@ const RestaurantDetailPage = () => {
                 </span>
               </button>
 
-              {/* Review Button */}
-              {/* add div to make the button not too close with each other */}
-              <div className="mx-5"> 
-              <button
-                className={`group ${styles["button"]}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/review/${restaurant._id}`);
-                }}
-              >
-                <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                  Write a review
-                </span>
-              </button>
+              <div className="mx-5">
+                <button
+                  className={`group ${styles["button"]}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/review/${restaurant._id}`);
+                  }}
+                >
+                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                    Write a review
+                  </span>
+                </button>
               </div>
-              <div className="mx-1"> 
-              <button
-                className={`group ${styles["button"]}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push(`/viewreview/${restaurant._id}`);
-                }}
-              >
-                <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                  View review
-                </span>
-              </button>
+              <div className="mx-1">
+                <button
+                  className={`group ${styles["button"]}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    router.push(`/viewreview/${restaurant._id}`);
+                  }}
+                >
+                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
+                    View review
+                  </span>
+                </button>
               </div>
             </div>
           </div>
@@ -334,66 +374,80 @@ const RestaurantDetailPage = () => {
           </div>
         </div>
       </div>
+      <div className="relative inline-block right-0">
+        <button
+          ref={filterButtonRef}
+          onClick={toggleFilterDropdown}
+          className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-3 rounded focus:outline-none focus:ring focus:ring-red-200 transition duration-300 ease-in-out flex items-center hover:scale-105 border-2 border-red-500"
+        >
+          <AdjustmentsHorizontalIcon
+            className="h-5 w-5 mr-2 text-white"
+            aria-hidden="true"
+          />
+          Filter
+        </button>
+        {isFilterOpen && (
+          <div
+            ref={filterDropdownRef}
+            className="absolute right-0 mt-2 w-52 bg-red-100 rounded-md shadow-lg z-10 overflow-hidden transition-all duration-300 ease-in-out transform origin-top-right scale-95 opacity-0 border-2 border-red-500"
+            style={{
+              transformOrigin: "top right",
+              transform: isFilterOpen ? "scale(1)" : "scale(0.95)",
+              opacity: isFilterOpen ? 1 : 0,
+              visibility: isFilterOpen ? "visible" : "hidden",
+            }}
+          >
+            {allergens.map((allergen) => (
+              <label
+                key={allergen}
+                className="block px-4 py-3 text-lg text-gray-800 hover:bg-red-200 cursor-pointer hover:scale-105 transition duration-150 ease-in-out border-b border-red-300 last:border-b-0"
+              >
+                <input
+                  type="checkbox"
+                  className="mr-2 leading-tight text-red-500 focus:ring-red-300 rounded border-red-300"
+                  value={allergen}
+                  checked={selectedAllergens.includes(allergen)}
+                  onChange={() => toggleAllergen(allergen)}
+                />
+                {selectedAllergens.includes(allergen) ? (
+                  <span className="font-semibold text-red-500">X</span>
+                ) : (
+                  <span>{allergen}</span>
+                )}
+              </label>
+            ))}
+            {allergens.length === 0 && (
+              <div className="px-4 py-2 text-gray-600">
+                No allergens found.
+              </div>
+            )}
+            {selectedAllergens.length > 0 && (
+              <button
+                onClick={() => setSelectedAllergens([])}
+                className="block w-full px-4 py-3 text-sm text-red-500 hover:bg-red-200 text-left cursor-pointer transition duration-150 ease-in-out hover:scale-105 border-t border-red-300"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {recommendedMenuItems.length > 0 && (
+        <div className="w-full md:w-3/4 lg:w-1/2 mt-8">
+          <RecommendedMenu
+            menuItems={recommendedMenuItems.map((item) => ({
+              ...item,
+              key: item._id,
+            }))}
+            selectedAllergens={selectedAllergens} // ส่ง selectedAllergens เป็น prop
+          />
+        </div>
+      )}
+
       <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
-        <div className="relative inline-block">
-          <button
-            ref={filterButtonRef}
-            onClick={toggleFilterDropdown}
-            className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-3 rounded focus:outline-none focus:ring focus:ring-red-200 transition duration-300 ease-in-out flex items-center hover:scale-105 border-2 border-red-500"
-          >
-            <AdjustmentsHorizontalIcon
-              className="h-5 w-5 mr-2 text-white"
-              aria-hidden="true"
-            />
-            Filter
-          </button>
-          {isFilterOpen && (
-            <div
-              ref={filterDropdownRef}
-              className="absolute right-0 mt-2 w-52 bg-red-100 rounded-md shadow-lg z-10 overflow-hidden transition-all duration-300 ease-in-out transform origin-top-right scale-95 opacity-0 border-2 border-red-500"
-              style={{
-                transformOrigin: "top right",
-                transform: isFilterOpen ? "scale(1)" : "scale(0.95)",
-                opacity: isFilterOpen ? 1 : 0,
-                visibility: isFilterOpen ? "visible" : "hidden",
-              }}
-            >
-              {allergens.map((allergen) => (
-                <label
-                  key={allergen}
-                  className="block px-4 py-3 text-lg text-gray-800 hover:bg-red-200 cursor-pointer hover:scale-105 transition duration-150 ease-in-out border-b border-red-300 last:border-b-0"
-                >
-                  <input
-                    type="checkbox"
-                    className="mr-2 leading-tight text-red-500 focus:ring-red-300 rounded border-red-300"
-                    value={allergen}
-                    checked={selectedAllergens.includes(allergen)}
-                    onChange={() => toggleAllergen(allergen)}
-                  />
-                  {selectedAllergens.includes(allergen) ? (
-                    <span className="font-semibold text-red-500">X</span>
-                  ) : (
-                    <span>{allergen}</span>
-                  )}
-                </label>
-              ))}
-              {allergens.length === 0 && (
-                <div className="px-4 py-2 text-gray-600">
-                  No allergens found.
-                </div>
-              )}
-              {selectedAllergens.length > 0 && (
-                <button
-                  onClick={() => setSelectedAllergens([])}
-                  className="block w-full px-4 py-3 text-sm text-red-500 hover:bg-red-200 text-left cursor-pointer transition duration-150 ease-in-out hover:scale-105 border-t border-red-300"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          )}
-        </div>
+
       </div>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2">
         {filteredMenuItems &&
@@ -444,17 +498,6 @@ const RestaurantDetailPage = () => {
                     </div>
                   )}
                 </div>
-                {/* เอาปุ่มออกเพราะไม่จำเป็นต้องมีปุ่มตรงเมนู */}
-                {/* <div className="w-full flex justify-center mt-4"> 
-            <button
-                  className={`group ${styles["button"]}`}
-                  onClick={() => handleClick(item)}
-                >
-                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                    Add menu to your order
-                  </span>
-                </button>
-              </div> */}
               </div>
             </div>
           ))}
@@ -465,36 +508,18 @@ const RestaurantDetailPage = () => {
           </p>
         )}
       </div>
-      {/* Popup overlay based on the example image */}
       {showPopup && selectedMenuItem && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
           <div className="bg-[#F4ECDD] rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden">
             {/* Header with Menu Picture */}
             <div className="bg-[#F4ECDD]  flex">
-              <img src="/img/menu.png" />
-              <div className="text-center">
-                <div className=" w-24 h-24 mx-auto flex items-center justify-center rounded "></div>
+              <img src="/img/menu.png" alt={selectedMenuItem.name} className="w-1/2 object-cover h-48"/>
+              <div className="w-1/2 flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-[#201335] text-xl font-bold mb-2">{selectedMenuItem.name}</h1>
+                  <p className="text-gray-600">{selectedMenuItem.description}</p>
+                </div>
               </div>
-            </div>
-
-            {/* Description */}
-            <div className="bg-gray-50 p-4 mt-4 mx-4 rounded ">
-              <h1 className="text-center text-[#201335] text-xl font-bold ">
-                {" "}
-                {selectedMenuItem.name}
-              </h1>
-              <p className="text-center text-gray-600">
-                {selectedMenuItem.description}
-              </p>
-            </div>
-
-            {/* Input Field */}
-            <div className="p-4">
-              <input
-                type="text"
-                placeholder="Enter..."
-                className="w-full p-2 border border-gray-300 rounded"
-              />
             </div>
 
             {/* Quantity Controls and Confirm Button */}

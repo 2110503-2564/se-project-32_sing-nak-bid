@@ -27,6 +27,7 @@ export interface Restaurant {
   region: string;
   opentime: string;
   closetime: string;
+  picture: string; //add picture
   managerId: string; // Or potentially a User interface if you have one
   // You might include virtuals here if you intend to use them on the client-side
   reservations?: any[]; // Adjust type if you have a Reservation interface
@@ -62,6 +63,7 @@ export interface MenuItem {
   name: string;
   price: number;
   description: string;
+  picture: string; //add picture for menu
 }
 
 export interface OrderItem {
