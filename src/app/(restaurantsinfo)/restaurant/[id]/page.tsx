@@ -5,6 +5,7 @@ import getRestaurant from "@/libs/getRestaurant"; // Adjust the path as needed
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
 import styles from "../../../../components/Button.module.css";
 import Rating from "@mui/material/Rating";
+import RecommendedMenu from "@/components/RecommendedMenu"; // Import the RecommendedMenu component
 
 interface RestaurantDetail {
   _id: string;
@@ -21,6 +22,8 @@ interface MenuItem {
   name: string;
   price: number;
   description: string;
+  recommended?: boolean; // Add recommended property
+  orderCount?: number; // Add orderCount property
   allergens?: Allergen[];
 }
 
@@ -42,6 +45,7 @@ const RestaurantDetailPage = () => {
   const [filteredMenuItems, setFilteredMenuItems] = useState<
     MenuItem[] | undefined
   >(restaurant?.menuItems);
+  const [recommendedMenuItems, setRecommendedMenuItems] = useState<MenuItem[]>([]);
   const filterDropdownRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -86,6 +90,10 @@ const RestaurantDetailPage = () => {
       });
       setAllergens(Array.from(allRestaurantAllergens));
       setFilteredMenuItems(restaurant.menuItems);
+      
+      // Filter recommended menu items
+      const recommended = restaurant.menuItems.filter(item => item.recommended === true);
+      setRecommendedMenuItems(recommended);
     }
   }, [restaurant?.menuItems]);
 
@@ -185,8 +193,6 @@ const RestaurantDetailPage = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8">
-      {" "}
-      {/* Removed -my-3 and added py-8 */}
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
         <img
           src="/img/food3.jpg"
@@ -212,28 +218,23 @@ const RestaurantDetailPage = () => {
                 </span>
               </div>
             </div>
-            {/* Red text */}
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Address:</span>{" "}
               {restaurant.address}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Tel:</span>{" "}
               {restaurant.tel}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700 mb-2">
               <span className="font-semibold text-red-500">Open Time:</span>{" "}
               {restaurant.opentime}
-            </p>{" "}
-            {/* Red accent */}
+            </p>
             <p className="text-gray-700">
               <span className="font-semibold text-red-500">Close Time:</span>{" "}
               {restaurant.closetime}
-            </p>{" "}
-            {/* Red accent */}
-            <div className="w-full flex  mt-4">
+            </p>
+            <div className="w-full flex mt-4">
               <button
                 className={`group ${styles["button"]}`}
                 onClick={(e) => {
@@ -246,8 +247,6 @@ const RestaurantDetailPage = () => {
                 </span>
               </button>
 
-              {/* Review Button */}
-              {/* add div to make the button not too close with each other */}
               <div className="mx-5"> 
               <button
                 className={`group ${styles["button"]}`}
@@ -334,6 +333,14 @@ const RestaurantDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Recommended Menu Section */}
+      {recommendedMenuItems.length > 0 && (
+        <div className="w-full md:w-3/4 lg:w-1/2 mt-8">
+          <RecommendedMenu menuItems={recommendedMenuItems} />
+        </div>
+      )}
+
       <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
         <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
         <div className="relative inline-block">
@@ -444,17 +451,6 @@ const RestaurantDetailPage = () => {
                     </div>
                   )}
                 </div>
-                {/* เอาปุ่มออกเพราะไม่จำเป็นต้องมีปุ่มตรงเมนู */}
-                {/* <div className="w-full flex justify-center mt-4"> 
-            <button
-                  className={`group ${styles["button"]}`}
-                  onClick={() => handleClick(item)}
-                >
-                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                    Add menu to your order
-                  </span>
-                </button>
-              </div> */}
               </div>
             </div>
           ))}
