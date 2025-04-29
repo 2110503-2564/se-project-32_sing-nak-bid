@@ -5,6 +5,7 @@ import getRestaurantsUser from '@/libs/getRestaurantUser'; // Adjust the import 
 import { Restaurant } from '../../../interfaces';
 import { getFuzzyMatches } from '@/utils/fuzzySearch'; // Ensure this utility exists
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ApiResponse {
   success: boolean;
@@ -68,9 +69,11 @@ const SearchPage = () => {
             >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
                 <div className="aspect-w-16 aspect-h-9 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center">
-                  <img
-                    src="/img/Food3.jpg"
+                  <Image
+                    src={restaurant.picture}
                     alt={restaurant.name}
+                    width={500}
+                    height={300}
                     className="object-cover w-full h-full"
                   />
                 </div>
