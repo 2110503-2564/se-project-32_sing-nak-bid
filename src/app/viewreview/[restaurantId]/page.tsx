@@ -172,7 +172,7 @@ export default function ManagerReviewPage({ params }: { params: { restaurantId: 
           className="inline-flex items-center text-amber-600 hover:text-amber-800 font-medium mb-4 transition-colors"
         >
           <ArrowLeft size={20} />
-          <span>กลับไปที่ร้านอาหาร</span>
+          <span>Back</span>
         </Link>
 
         {restaurant && (

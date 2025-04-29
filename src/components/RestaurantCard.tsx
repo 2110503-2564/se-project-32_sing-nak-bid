@@ -23,7 +23,6 @@ export default function RestaurantCard({
     alt={restaurantname}
     fill
     className="object-cover opacity-65"
-    priority // Optional: for fast loading if above the fold
   />
 </div>
       {/* Foreground Content */}
