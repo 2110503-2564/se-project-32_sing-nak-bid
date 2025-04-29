@@ -7,6 +7,7 @@ interface MenuItem {
   name: string;
   price: number;
   description: string;
+  recommended?: boolean;
   orderCount?: number;
   allergens?: {
     _id: string;
@@ -17,55 +18,59 @@ interface MenuItem {
 
 interface RecommendedMenuProps {
   menuItems: MenuItem[];
+  selectedAllergens: string[];
+  selectedCount: number; // จำนวนเมนูที่ถูกเลือกไปแล้ว
 }
 
-export default function RecommendedMenu({ menuItems }: RecommendedMenuProps) {
+export default function RecommendedMenu({
+  menuItems,
+  selectedAllergens,
+  selectedCount,
+}: RecommendedMenuProps) {
   const [recommendedItems, setRecommendedItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
-    // Always show recommended items, even if no orderCount
     if (menuItems && menuItems.length > 0) {
-      // First try to get items with orderCount
-      let sorted = [...menuItems]
-        .filter(item => item.orderCount && item.orderCount > 0)
-        .sort((a, b) => (b.orderCount || 0) - (a.orderCount || 0))
-        .slice(0, 3);
-      
-      // If we don't have enough items with orderCount, just pick some random ones
-      if (sorted.length < 3) {
-        const remainingCount = 3 - sorted.length;
-        const itemsWithoutOrderCount = menuItems
-          .filter(item => !item.orderCount || item.orderCount === 0)
-          .slice(0, remainingCount);
-        
-        sorted = [...sorted, ...itemsWithoutOrderCount];
-      }
-      
-      // If still not enough, just take whatever we have up to 3
-      if (sorted.length < 3 && menuItems.length > 0) {
-        sorted = [...sorted, ...menuItems.slice(0, 3 - sorted.length)];
-      }
-      
-      setRecommendedItems(sorted.slice(0, 3));
-    }
-  }, [menuItems]);
+      // Filter for recommended items first
+      const onlyRecommended = menuItems.filter((item) => item.recommended === true);
 
-  // Always render the section even if there are no items
+      // Filter recommended items based on selectedAllergens
+      const filteredByAllergens = onlyRecommended.filter((item) => {
+        if (!selectedAllergens || selectedAllergens.length === 0 || !item.allergens) {
+          return true;
+        }
+        return !item.allergens.some((allergen) => {
+          if (allergen.name && Array.isArray(allergen.name)) {
+            return allergen.name.some((name) => selectedAllergens.includes(name));
+          } else if (allergen.name && typeof allergen.name === "string") {
+            return selectedAllergens.includes(allergen.name);
+          }
+          return false;
+        });
+      });
+
+      // Take up to 3 recommended items
+      setRecommendedItems(filteredByAllergens.slice(0, 3));
+    } else {
+      setRecommendedItems([]);
+    }
+  }, [menuItems, selectedAllergens]);
+
   return (
     <div className={styles.recommendedSection}>
       <div className={styles.header}>
         <h2 className={styles.title}>Recommended Menu</h2>
         <div className={styles.lightIcon}>🔥</div>
       </div>
-      
+
       <div className={styles.menuGrid}>
         {recommendedItems.length > 0 ? (
-          recommendedItems.map((item,index) => (
-            <div key={item._id + '-' + index} className={styles.menuCard}> {/* Ensure unique key */}
-              <img 
-                src="/img/menu.png" 
-                alt={item.name} 
-                className={styles.menuImage} 
+          recommendedItems.map((item, index) => (
+            <div key={item._id + '-' + index} className={styles.menuCard}>
+              <img
+                src="/img/menu.png"
+                alt={item.name}
+                className={styles.menuImage}
               />
               <div className={styles.menuContent}>
                 <h3 className={styles.menuName}>{item.name}</h3>
@@ -95,7 +100,7 @@ export default function RecommendedMenu({ menuItems }: RecommendedMenuProps) {
           ))
         ) : (
           <div className={styles.noItems}>
-            <p>No recommended items available yet.</p>
+            <p>No recommended items available based on your filters.</p>
           </div>
         )}
       </div>
