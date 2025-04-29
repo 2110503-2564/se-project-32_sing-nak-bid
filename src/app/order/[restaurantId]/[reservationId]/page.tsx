@@ -37,6 +37,7 @@ interface MenuItem {
   description: string;
   allergens?: Allergen[];
   picture : string;
+  stockCount: number;
 }
 
 interface Allergen {
@@ -813,12 +814,15 @@ const OrdersMenuPage = () => {
                       .join(', ')}
                   </div>
                 )}
-                <button 
-                  onClick={() => handleClick(item)}
-                  className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02]"
-                >
-                  Add to Order
-                </button>
+                <button
+  onClick={() => handleClick(item)}
+  className={`w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-[1.02]
+    ${item.stockCount < 5 ? 'opacity-50 cursor-not-allowed' : ''}
+  `}
+  disabled={item.stockCount < 5}
+>
+  {item.stockCount < 5 ? 'Out of Stock' : 'Add to Order'}
+</button>
               </div>
             </motion.div>
           ))}
