@@ -11,6 +11,7 @@ interface MenuItem {
   name: string;
   price: number;
   description: string;
+  picture: string;
 }
 
 interface OrderItem {
@@ -94,8 +95,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
               key={item._id}
               className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300"
             >
-              <img
-          src="/img/food1.jpg"
+              <Image
+          src={item.menuItem.picture}
+          alt={item.menuItem.name}
+          width={500}
+          height={300}
           className="rounded-md mb-4 w-full object-cover h-48"
         />
               <div className="p-5">

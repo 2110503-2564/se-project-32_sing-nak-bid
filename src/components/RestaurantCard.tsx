@@ -1,5 +1,6 @@
 import { RestaurantJson } from "../../interfaces";
 import Rating from "@mui/material/Rating";
+import Image from "next/image";
 
 export default function RestaurantCard({
   restaurantname,
@@ -16,10 +17,14 @@ export default function RestaurantCard({
       {/* Background black overlay */}
       <div className="absolute top-0 left-0 h-full w-full bg-[#111111] z-0"></div>
       {/* Background image */}
-      <div
-        className="absolute top-0 left-0 h-full w-full bg-cover bg-center opacity-65 z-[1]"
-        style={{ backgroundImage: `url(${imgSrc})` }}
-      />
+      <div className="absolute top-0 left-0 h-full w-full z-[1]">
+  <Image
+    src={imgSrc}
+    alt={restaurantname}
+    fill
+    className="object-cover opacity-65"
+  />
+</div>
       {/* Foreground Content */}
       <div className="container text-white z-[2] relative font-nunito flex flex-col gap-[0.5em]">
         <div className="h-fit w-full">

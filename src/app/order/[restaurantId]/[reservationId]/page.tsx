@@ -11,7 +11,7 @@ import addOrder from '@/libs/addOrder';
 import { useSession } from 'next-auth/react';
 import getUserProfile from '@/libs/getUserProfile';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import Image from 'next/image';
 // Import OrderItem interface (สมมติว่าอยู่ในไฟล์นี้)
 interface OrderItem {
   _id: string; // ID ของ MenuItem
@@ -27,6 +27,7 @@ interface RestaurantDetail {
   opentime: string;
   closetime: string;
   menuItems?: MenuItem[];
+  picture: string;
 }
 
 interface MenuItem {
@@ -35,6 +36,7 @@ interface MenuItem {
   price: number;
   description: string;
   allergens?: Allergen[];
+  picture : string;
 }
 
 interface Allergen {
@@ -610,9 +612,11 @@ const OrdersMenuPage = () => {
         className="bg-white rounded-xl shadow-xl overflow-hidden mb-6"
       >
         <div className="relative h-52 overflow-hidden">
-          <img 
-            src="/img/food3.jpg"
+          <Image
+            src={restaurant.picture}
             alt={restaurant.name}
+            width={500}
+            height={300}
             className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
@@ -780,7 +784,7 @@ const OrdersMenuPage = () => {
               className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition duration-300"
             >
               <div className="relative">
-                <img src="/img/menu.png" alt={item.name} className="w-full object-cover h-40" />
+                <Image src={item.picture} alt={item.name}  width={500}  height={300} className="w-full object-cover h-40" />
                 {item.allergens && item.allergens.length > 0 && (
                   <div className="absolute top-2 right-2 bg-white bg-opacity-90 text-xs text-rose-500 px-2 py-1 rounded-full">
                     <span className="font-medium">⚠️ Allergens</span>
@@ -856,9 +860,11 @@ const OrdersMenuPage = () => {
     >
       {/* Header with Menu Picture */}
       <div className="relative h-48">
-        <img 
-          src="/img/menu.png" 
+        <Image
+          src={selectedMenuItem.picture}
           alt={selectedMenuItem.name} 
+          width={500}
+          height={300}
           className="w-full h-full object-cover" 
         />
         <div className="absolute top-0 right-0 m-3">

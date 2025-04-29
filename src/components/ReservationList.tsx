@@ -38,7 +38,8 @@ export default function ReservationList() {
       } catch (error) {
         console.error("Failed to fetch reservations:", error);
       } finally {
-        new Promise((res) => setTimeout(res, 1000));
+        // Make sure we have a slight delay to avoid flickering
+        await new Promise((res) => setTimeout(res, 1000));
         setLoading(false);
       }
     };
@@ -83,7 +84,7 @@ export default function ReservationList() {
                 <div key={index} className="bg-white shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl">
                   <div className="bg-orange-100 p-4 border-b border-orange-200">
                     <h2 className="text-xl font-bold text-gray-800">
-                      {reservationsItem.restaurant.name}
+                      {reservationsItem.restaurant?.name || "Restaurant information unavailable"}
                     </h2>
                   </div>
                   
@@ -112,12 +113,15 @@ export default function ReservationList() {
                     </div>
                     
                     <div className="flex flex-col md:flex-row gap-3">
-                      <button
-                        className="flex-1 bg-yellow-500 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-300 hover:bg-yellow-400 focus:ring-2 focus:ring-yellow-300 focus:outline-none"
-                        onClick={() => router.push(`/order/${reservationsItem.restaurant._id}/${reservationsItem._id}`)}
-                      >
-                        Order Menu
-                      </button>
+                      {/* Only show order button if restaurant exists */}
+                      {reservationsItem.restaurant && (
+                        <button
+                          className="flex-1 bg-yellow-500 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-300 hover:bg-yellow-400 focus:ring-2 focus:ring-yellow-300 focus:outline-none"
+                          onClick={() => router.push(`/order/${reservationsItem.restaurant._id}/${reservationsItem._id}`)}
+                        >
+                          Order Menu
+                        </button>
+                      )}
                       
                       <button
                         className="flex-1 bg-green-500 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-300 hover:bg-green-400 focus:ring-2 focus:ring-green-300 focus:outline-none"

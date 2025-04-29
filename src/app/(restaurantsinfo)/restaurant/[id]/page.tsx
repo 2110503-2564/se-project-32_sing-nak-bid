@@ -6,6 +6,9 @@ import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
 import styles from "../../../../components/Button.module.css";
 import Rating from "@mui/material/Rating";
 import RecommendedMenu from "@/components/RecommendedMenu"; // Import the RecommendedMenu component
+import { Restaurant } from "../../../../../interfaces";
+import Image from "next/image";
+
 
 interface RestaurantDetail {
   _id: string;
@@ -14,6 +17,7 @@ interface RestaurantDetail {
   tel: string;
   opentime: string;
   closetime: string;
+  picture: string;
   menuItems?: MenuItem[];
 }
 
@@ -25,6 +29,7 @@ interface MenuItem {
   recommended?: boolean; // Add recommended property
   orderCount?: number; // Add orderCount property
   allergens?: Allergen[];
+  picture: string;
 }
 
 interface Allergen {
@@ -37,7 +42,7 @@ const RestaurantDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const [restaurant, setRestaurant] = useState<RestaurantDetail | null>(null);
+  const [restaurant, setRestaurant] = useState<Restaurant| null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [allergens, setAllergens] = useState<string[]>([]);
@@ -231,13 +236,15 @@ const RestaurantDetailPage = () => {
     setShowPopup(false);
     setSelectedMenuItem(null);
   };
-
+ 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-8">
       <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
-        <img
-          src="/img/food3.jpg"
+        <Image
+          src={restaurant.picture}
           alt={restaurant.name}
+          width={500} 
+          height={300}
           className="rounded-md mb-4 w-full object-cover h-48"
         />
         <div className="flex justify-between items-start">
@@ -457,9 +464,11 @@ const RestaurantDetailPage = () => {
               className="bg-white rounded-lg overflow-hidden hover:scale-105 transition duration-200 ease-in-out hover:border-4 hover:border-red-300"
             >
               <div className="relative">
-                <img
-                  src="/img/menu.png"
+                <Image
+                  src={item.picture}
                   alt={item.name}
+                  width={500}
+                  height={500}
                   className="rounded-t-lg w-full object-cover h-32"
                 />
               </div>

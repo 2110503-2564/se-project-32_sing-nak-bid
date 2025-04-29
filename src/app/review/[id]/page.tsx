@@ -7,6 +7,7 @@ import { Rating } from '@mui/material';
 import styles from './ReviewPage.module.css';
 import { useSession } from 'next-auth/react';
 import addRating from '@/libs/addRating';
+import Image from 'next/image';
 
 export default function ReviewPage({ params }: { params: { id: string } }) {
   const router = useRouter(); // add router for a button to navigate to restaurant page after click the button
@@ -34,10 +35,10 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true); // Set loading state
-    console.log("Session Token:", session?.user?.token);
-    console.log("Selected Restaurant ID:", restaurant.id);
-    console.log("Score:", rating);
-    console.log("Comment:", comment);
+    // console.log("Session Token:", session?.user?.token);
+    // console.log("Selected Restaurant ID:", restaurant.id);
+    // console.log("Score:", rating);
+    // console.log("Comment:", comment);
 
     if (!session?.user?.token || !restaurant || !rating || !comment) {
       alert("Please fill all field");
@@ -53,9 +54,9 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
     if(success){
       router.push(`/restaurant/${params.id}`)
       alert("Thank for review our Restaurant!");
-      alert(restaurant.id);
-      alert(rating);
-      alert(comment);
+      // alert(restaurant.id);
+      // alert(rating);
+      // alert(comment);
 
       // Reset form after Post a review
       setRating(0);
@@ -77,7 +78,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
 
   return (
     <div className={styles.container}>
-    <img src="/img/Food4.png" alt={`${restaurant.name} picture`} className={styles.restaurantImage} />
+    <Image src={restaurant.picture} alt={`${restaurant.name} picture`} width={500} height={300} className={styles.restaurantImage} />
       <div className='flex flex-col items-center justify-center'>
       <h1 className={styles.header}>Review {restaurant.name} Restaurant</h1>
 
