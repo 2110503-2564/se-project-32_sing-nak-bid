@@ -1,14 +1,14 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import getRestaurant from "@/libs/getRestaurant"; // Adjust the path as needed
+import getRestaurant from "@/libs/getRestaurant";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
 import styles from "../../../../components/Button.module.css";
 import Rating from "@mui/material/Rating";
-import RecommendedMenu from "@/components/RecommendedMenu"; // Import the RecommendedMenu component
+import RecommendedMenu from "@/components/RecommendedMenu";
 import { Restaurant } from "../../../../../interfaces";
 import Image from "next/image";
-
+import { FaRegClock, FaPhone, FaMapMarkerAlt, FaHeart, FaShoppingCart } from "react-icons/fa";
 
 interface RestaurantDetail {
   _id: string;
@@ -26,8 +26,8 @@ interface MenuItem {
   name: string;
   price: number;
   description: string;
-  recommended?: boolean; // Add recommended property
-  orderCount?: number; // Add orderCount property
+  recommended?: boolean;
+  orderCount?: number;
   allergens?: Allergen[];
   picture: string;
 }
@@ -42,22 +42,22 @@ const RestaurantDetailPage = () => {
   const router = useRouter();
   const params = useParams();
   const { id } = params;
-  const [restaurant, setRestaurant] = useState<Restaurant| null>(null);
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [allergens, setAllergens] = useState<string[]>([]);
   const [selectedAllergens, setSelectedAllergens] = useState<string[]>([]);
-  const [filteredMenuItems, setFilteredMenuItems] = useState<
-    MenuItem[] | undefined
-  >(restaurant?.menuItems);
+  const [filteredMenuItems, setFilteredMenuItems] = useState<MenuItem[] | undefined>(
+    restaurant?.menuItems
+  );
   const [recommendedMenuItems, setRecommendedMenuItems] = useState<MenuItem[]>([]);
   const filterDropdownRef = useRef<HTMLDivElement | null>(null);
   const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(
-    null
-  );
+  const [selectedMenuItem, setSelectedMenuItem] = useState<MenuItem | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
     const fetchRestaurantDetail = async () => {
@@ -83,7 +83,7 @@ const RestaurantDetailPage = () => {
     if (restaurant?.menuItems) {
       const allRestaurantAllergens = new Set<string>();
       const deduplicatedItems = Array.from(
-        new Map(restaurant.menuItems.map(item => [item._id, item])).values()
+        new Map(restaurant.menuItems.map((item) => [item._id, item])).values()
       );
 
       deduplicatedItems.forEach((item) => {
@@ -122,16 +122,11 @@ const RestaurantDetailPage = () => {
           }
           return !item.allergens.some((allergen) => {
             if (allergen.name && Array.isArray(allergen.name)) {
-              return allergen.name.some((name) =>
-                selectedAllergens.includes(name)
-              );
+              return allergen.name.some((name) => selectedAllergens.includes(name));
             } else if (allergen.name && typeof allergen.name === "string") {
               return selectedAllergens.includes(allergen.name);
             } else {
-              console.warn(
-                "Unexpected allergen name format for some:",
-                allergen.name
-              );
+              console.warn("Unexpected allergen name format for some:", allergen.name);
               return false;
             }
           });
@@ -143,16 +138,11 @@ const RestaurantDetailPage = () => {
           }
           return !item.allergens.some((allergen) => {
             if (allergen.name && Array.isArray(allergen.name)) {
-              return allergen.name.some((name) =>
-                selectedAllergens.includes(name)
-              );
+              return allergen.name.some((name) => selectedAllergens.includes(name));
             } else if (allergen.name && typeof allergen.name === "string") {
               return selectedAllergens.includes(allergen.name);
             } else {
-              console.warn(
-                "Unexpected allergen name format for some:",
-                allergen.name
-              );
+              console.warn("Unexpected allergen name format for some:", allergen.name);
               return false;
             }
           });
@@ -206,7 +196,7 @@ const RestaurantDetailPage = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        Loading restaurant details...
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600 border-opacity-75"></div>
       </div>
     );
   }
@@ -229,6 +219,7 @@ const RestaurantDetailPage = () => {
 
   const handleClick = (menuItem: MenuItem) => {
     setSelectedMenuItem(menuItem);
+    setQuantity(1);
     setShowPopup(true);
   };
 
@@ -236,315 +227,387 @@ const RestaurantDetailPage = () => {
     setShowPopup(false);
     setSelectedMenuItem(null);
   };
- 
+
+  const incrementQuantity = () => {
+    setQuantity((prev) => prev + 1);
+  };
+
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => prev - 1);
+    }
+  };
+
+  // Create menu categories 
+  const menuCategories = ["all", "appetizers", "main", "desserts", "drinks"];
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-8">
-      <div className="bg-white rounded-lg shadow-md p-10 mb-8 w-full md:w-3/4 lg:w-1/2">
+    <div className="flex flex-col items-center bg-gray-50 min-h-screen">
+      {/* Hero Section with Restaurant Image */}
+      <div className="w-full h-64 md:h-80 lg:h-96 relative">
         <Image
           src={restaurant.picture}
           alt={restaurant.name}
-          width={500} 
-          height={300}
-          className="rounded-md mb-4 w-full object-cover h-48"
+          layout="fill"
+          objectFit="cover"
+          className="brightness-75"
         />
-        <div className="flex justify-between items-start">
-          <div className="flex-grow">
-            <div className="flex items-center mb-4">
-              <h1 className="text-3xl font-semibold text-red-700">
-                {restaurant.name}
-              </h1>
-              <div className="flex items-center ml-4">
-                <Rating
-                  name="read-only-rating"
-                  value={2}
-                  readOnly
-                  precision={0.5}
-                  size="medium"
-                />
-                <span className="ml-2 text-sm text-gray-600">
-                  {/* {restaurant.averageRating.toFixed(1)} */}
-                </span>
-              </div>
-            </div>
-            <p className="text-gray-700 mb-2">
-              <span className="font-semibold text-red-500">Address:</span>{" "}
-              {restaurant.address}
-            </p>
-            <p className="text-gray-700 mb-2">
-              <span className="font-semibold text-red-500">Tel:</span>{" "}
-              {restaurant.tel}
-            </p>
-            <p className="text-gray-700 mb-2">
-              <span className="font-semibold text-red-500">Open Time:</span>{" "}
-              {restaurant.opentime}
-            </p>
-            <p className="text-gray-700">
-              <span className="font-semibold text-red-500">Close Time:</span>{" "}
-              {restaurant.closetime}
-            </p>
-            <div className="w-full flex mt-4">
-              <button
-                className={`group ${styles["button"]}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  router.push("/reserve");
-                }}
-              >
-                <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                  Reserve this Restaurant
-                </span>
-              </button>
-
-              <div className="mx-5">
-                <button
-                  className={`group ${styles["button"]}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/review/${restaurant._id}`);
-                  }}
-                >
-                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                    Write a review
-                  </span>
-                </button>
-              </div>
-              <div className="mx-1">
-                <button
-                  className={`group ${styles["button"]}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    router.push(`/viewreview/${restaurant._id}`);
-                  }}
-                >
-                  <span className="relative z-10 text-white group-hover:text-black transition-colors duration-300">
-                    View review
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-          <div className="flex-shrink-0 ml-4">
-            <div className="card">
-              <ul className="flex flex-col py-5 gap-5">
-                {/* Facebook */}
-                <li className="iso-pro">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <a href="#">
-                    <svg
-                      viewBox="0 0 320 512"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="svg h-6 w-6"
-                    >
-                      <path d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z" />
-                    </svg>
-                  </a>
-                  <div className="text">Facebook</div>
-                </li>
-
-                {/* Twitter */}
-                <li className="iso-pro">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <a href="#">
-                    <svg
-                      viewBox="0 0 512 512"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="svg h-6 w-6"
-                    >
-                      <path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z" />
-                    </svg>
-                  </a>
-                  <div className="text">Twitter</div>
-                </li>
-
-                {/* Instagram */}
-                <li className="iso-pro">
-                  <span></span>
-                  <span></span>
-                  <span></span>
-                  <a href="#">
-                    <svg
-                      viewBox="0 0 448 512"
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="svg h-6 w-6"
-                    >
-                      <path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z" />
-                    </svg>
-                  </a>
-                  <div className="text">Instagram</div>
-                </li>
-              </ul>
-            </div>
+        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black to-transparent h-32 p-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+            {restaurant.name}
+          </h1>
+          <div className="flex items-center mt-2">
+            <Rating
+              name="read-only-rating"
+              value={4.2}
+              readOnly
+              precision={0.5}
+              size="medium"
+            />
+            <span className="ml-2 text-white text-sm">4.2 (245 reviews)</span>
           </div>
         </div>
       </div>
-      <div className="relative inline-block right-0">
-        <button
-          ref={filterButtonRef}
-          onClick={toggleFilterDropdown}
-          className="bg-red-300 hover:bg-red-400 text-white font-bold py-2 px-3 rounded focus:outline-none focus:ring focus:ring-red-200 transition duration-300 ease-in-out flex items-center hover:scale-105 border-2 border-red-500"
-        >
-          <AdjustmentsHorizontalIcon
-            className="h-5 w-5 mr-2 text-white"
-            aria-hidden="true"
-          />
-          Filter
-        </button>
-        {isFilterOpen && (
-          <div
-            ref={filterDropdownRef}
-            className="absolute right-0 mt-2 w-52 bg-red-100 rounded-md shadow-lg z-10 overflow-hidden transition-all duration-300 ease-in-out transform origin-top-right scale-95 opacity-0 border-2 border-red-500"
-            style={{
-              transformOrigin: "top right",
-              transform: isFilterOpen ? "scale(1)" : "scale(0.95)",
-              opacity: isFilterOpen ? 1 : 0,
-              visibility: isFilterOpen ? "visible" : "hidden",
-            }}
-          >
-            {allergens.map((allergen) => (
-              <label
-                key={allergen}
-                className="block px-4 py-3 text-lg text-gray-800 hover:bg-red-200 cursor-pointer hover:scale-105 transition duration-150 ease-in-out border-b border-red-300 last:border-b-0"
-              >
-                <input
-                  type="checkbox"
-                  className="mr-2 leading-tight text-red-500 focus:ring-red-300 rounded border-red-300"
-                  value={allergen}
-                  checked={selectedAllergens.includes(allergen)}
-                  onChange={() => toggleAllergen(allergen)}
-                />
-                {selectedAllergens.includes(allergen) ? (
-                  <span className="font-semibold text-red-500">X</span>
-                ) : (
-                  <span>{allergen}</span>
-                )}
-              </label>
-            ))}
-            {allergens.length === 0 && (
-              <div className="px-4 py-2 text-gray-600">
-                No allergens found.
+
+      {/* Restaurant Info Section */}
+      <div className="container mx-auto px-4 -mt-10 relative z-10">
+        <div className="bg-white rounded-lg shadow-xl p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex items-center">
+              <div className="bg-red-100 rounded-full p-3 mr-4">
+                <FaMapMarkerAlt className="text-red-500 h-5 w-5" />
               </div>
-            )}
-            {selectedAllergens.length > 0 && (
-              <button
-                onClick={() => setSelectedAllergens([])}
-                className="block w-full px-4 py-3 text-sm text-red-500 hover:bg-red-200 text-left cursor-pointer transition duration-150 ease-in-out hover:scale-105 border-t border-red-300"
-              >
-                Clear
-              </button>
-            )}
+              <div>
+                <p className="text-sm text-gray-500">Location</p>
+                <p className="font-medium">{restaurant.address}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="bg-red-100 rounded-full p-3 mr-4">
+                <FaRegClock className="text-red-500 h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Hours</p>
+                <p className="font-medium">{restaurant.opentime} - {restaurant.closetime}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center">
+              <div className="bg-red-100 rounded-full p-3 mr-4">
+                <FaPhone className="text-red-500 h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Contact</p>
+                <p className="font-medium">{restaurant.tel}</p>
+              </div>
+            </div>
           </div>
-        )}
+          
+          <div className="flex mt-6 gap-4 flex-wrap">
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white font-medium px-6 py-2.5 rounded-lg transition duration-300 flex items-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push("/reserve");
+              }}
+            >
+              Reserve Table
+            </button>
+            
+            <button
+              className="bg-white border-2 border-red-600 text-red-600 hover:bg-red-50 font-medium px-6 py-2.5 rounded-lg transition duration-300 flex items-center"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/review/${restaurant._id}`);
+              }}
+            >
+              Write Review
+            </button>
+            
+            <button
+              className="bg-white border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-medium px-6 py-2.5 rounded-lg transition duration-300 flex items-center gap-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/viewreview/${restaurant._id}`);
+              }}
+            >
+              <span>View Reviews</span>
+            </button>
+          </div>
+        </div>
       </div>
 
+      {/* Recommended Menu Section */}
       {recommendedMenuItems.length > 0 && (
-        <div className="w-full md:w-3/4 lg:w-1/2 mt-8">
-          <RecommendedMenu
-            menuItems={recommendedMenuItems.map((item) => ({
-              ...item,
-              key: item._id,
-            }))}
-            selectedAllergens={selectedAllergens} // ส่ง selectedAllergens เป็น prop
-          />
+        <div className="container mx-auto px-4 mt-6">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-gradient-to-r from-red-600 to-red-400 p-4">
+              <h2 className="text-xl font-bold text-white flex items-center">
+                <FaHeart className="mr-2" /> Chef's Recommendations
+              </h2>
+            </div>
+            <div className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {recommendedMenuItems.map((item) => (
+                  <div
+                    key={item._id}
+                    onClick={() => handleClick(item)}
+                    className="bg-white border border-gray-200 rounded-lg overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <div className="h-48 relative overflow-hidden">
+                      <Image
+                        src={item.picture}
+                        alt={item.name}
+                        layout="fill"
+                        objectFit="cover"
+                        className="transform hover:scale-105 transition-transform duration-300"
+                      />
+                      {item.recommended && (
+                        <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                          Popular
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-medium text-lg">{item.name}</h3>
+                      <p className="text-gray-600 text-sm mt-1 line-clamp-2">
+                        {item.description}
+                      </p>
+                      <div className="flex justify-between items-center mt-3">
+                        <div className="font-bold text-red-600">฿{item.price.toFixed(2)}</div>  
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
-      <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
-
-      </div>
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2">
-        {filteredMenuItems &&
-          filteredMenuItems.map((item) => (
-            <div
-              key={item._id}
-              className="bg-white rounded-lg overflow-hidden hover:scale-105 transition duration-200 ease-in-out hover:border-4 hover:border-red-300"
-            >
-              <div className="relative">
-                <Image
-                  src={item.picture}
-                  alt={item.name}
-                  width={500}
-                  height={500}
-                  className="rounded-t-lg w-full object-cover h-32"
+      {/* Menu Categories and Filter */}
+      <div className="container mx-auto px-4 mt-10">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Our Menu</h2>
+          
+          <div className="flex items-center mt-4 md:mt-0">
+            <div className="mr-4">
+              <button
+                ref={filterButtonRef}
+                onClick={toggleFilterDropdown}
+                className="bg-white hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded-lg border border-gray-300 flex items-center transition duration-300"
+              >
+                <AdjustmentsHorizontalIcon
+                  className="h-5 w-5 mr-2 text-gray-500"
+                  aria-hidden="true"
                 />
-              </div>
-              <div className="p-6">
-                <h3 className="font-semibold text-xl text-red-700 mb-2">
-                  {item.name}
-                </h3>
-                <p className="text-gray-700 text-base mb-3">
-                  {item.description}
-                </p>
-                <div className="flex justify-between items-center">
-                  <p className="text-green-600 font-bold text-lg">
-                    ฿{item.price.toFixed(2)}
-                  </p>
-                  {item.allergens && item.allergens.length > 0 && (
-                    <div className="text-sm text-red-500 italic">
-                      Contains:{" "}
-                      {item.allergens
-                        .map((allergen) => {
-                          if (allergen.name && Array.isArray(allergen.name)) {
-                            return allergen.name.join(", ");
-                          } else if (
-                            allergen.name &&
-                            typeof allergen.name === "string"
-                          ) {
-                            return allergen.name;
-                          } else {
-                            console.warn(
-                              "Unexpected allergen name format for join:",
-                              allergen.name
-                            );
-                            return "";
-                          }
-                        })
-                        .join(", ")}
+                Filter Allergens
+                {selectedAllergens.length > 0 && (
+                  <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {selectedAllergens.length}
+                  </span>
+                )}
+              </button>
+              {isFilterOpen && (
+                <div
+                  ref={filterDropdownRef}
+                  className="absolute mt-2 w-64 bg-white rounded-lg shadow-xl z-10 border border-gray-200 overflow-hidden"
+                >
+                  <div className="p-4 border-b border-gray-100">
+                    <h3 className="font-medium text-gray-700">Filter by Allergens</h3>
+                  </div>
+                  <div className="max-h-60 overflow-y-auto">
+                    {allergens.map((allergen) => (
+                      <label
+                        key={allergen}
+                        className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                      >
+                        <input
+                          type="checkbox"
+                          className="form-checkbox h-5 w-5 text-red-500 rounded border-gray-300 focus:ring-red-500"
+                          value={allergen}
+                          checked={selectedAllergens.includes(allergen)}
+                          onChange={() => toggleAllergen(allergen)}
+                        />
+                        <span className="ml-3 text-gray-700">
+                          {allergen}
+                        </span>
+                      </label>
+                    ))}
+                    {allergens.length === 0 && (
+                      <div className="px-4 py-3 text-gray-500 text-center">
+                        No allergens found
+                      </div>
+                    )}
+                  </div>
+                  {selectedAllergens.length > 0 && (
+                    <div className="p-3 bg-gray-50 border-t border-gray-100">
+                      <button
+                        onClick={() => setSelectedAllergens([])}
+                        className="w-full py-2 text-sm font-medium text-red-600 hover:text-red-700"
+                      >
+                        Clear Filters
+                      </button>
                     </div>
                   )}
                 </div>
-              </div>
+              )}
             </div>
-          ))}
-        {filteredMenuItems && filteredMenuItems.length === 0 && (
-          <p className="text-gray-500">
-            No menu items found{" "}
-            {selectedAllergens.length > 0 ? "matching your filter." : "."}
-          </p>
-        )}
-      </div>
-      {showPopup && selectedMenuItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-          <div className="bg-[#F4ECDD] rounded-lg shadow-lg w-full max-w-md mx-4 overflow-hidden">
-            {/* Header with Menu Picture */}
-            <div className="bg-[#F4ECDD]  flex">
-              <img src="/img/menu.png" alt={selectedMenuItem.name} className="w-1/2 object-cover h-48"/>
-              <div className="w-1/2 flex items-center justify-center">
-                <div className="text-center">
-                  <h1 className="text-[#201335] text-xl font-bold mb-2">{selectedMenuItem.name}</h1>
-                  <p className="text-gray-600">{selectedMenuItem.description}</p>
+          </div>
+        </div>
+
+        {/* Menu Categories */}
+        <div className="scrollbar-hide overflow-x-auto mb-6">
+          <div className="flex space-x-2 min-w-max pb-2">
+            {menuCategories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`py-2 px-4 rounded-full capitalize transition duration-300 ${
+                  activeCategory === category
+                    ? "bg-red-600 text-white font-medium"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Menu Items */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {filteredMenuItems &&
+            filteredMenuItems.map((item) => (
+              <div
+                key={item._id}
+                onClick={() => handleClick(item)}
+                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg cursor-pointer transition-all duration-300 transform hover:-translate-y-1"
+              >
+                <div className="h-48 relative overflow-hidden">
+                  <Image
+                    src={item.picture}
+                    alt={item.name}
+                    layout="fill"
+                    objectFit="cover"
+                    className="transform hover:scale-105 transition-transform duration-300"
+                  />
+                  {item.recommended && (
+                    <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold flex items-center">
+                      <FaHeart className="mr-1" /> Popular
+                    </div>
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-medium text-gray-800">{item.name}</h3>
+                  <p className="text-gray-600 mt-2 text-sm line-clamp-2">
+                    {item.description}
+                  </p>
+                  
+                  {item.allergens && item.allergens.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {item.allergens.map((allergen, index) => {
+                        const allergenNames = Array.isArray(allergen.name)
+                          ? allergen.name
+                          : [allergen.name];
+                        
+                        return allergenNames.map((name, i) => (
+                          <span
+                            key={`${index}-${i}`}
+                            className="bg-red-50 text-red-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {name}
+                          </span>
+                        ));
+                      })}
+                    </div>
+                  )}
+                  
+                  <div className="flex justify-between items-center mt-4">
+                    <div className="font-bold text-gray-900">฿{item.price.toFixed(2)}</div>
+                  </div>
                 </div>
               </div>
+            ))}
+          {filteredMenuItems && filteredMenuItems.length === 0 && (
+            <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
+              <h3 className="text-xl font-medium text-gray-800 mb-2">No menu items found</h3>
+              <p className="text-gray-500">
+                {selectedAllergens.length > 0
+                  ? "Try adjusting your allergen filters"
+                  : "The menu items will appear here"}
+              </p>
             </div>
+          )}
+        </div>
+      </div>
 
-            {/* Quantity Controls and Confirm Button */}
-            <div className="p-4 flex justify-between items-center bg-[#F4ECDD]">
-              <div className="flex items-center space-x-4">
-                <button className="text-2xl font-bold text-gray-600">-</button>
-                <span className="text-lg">1</span>
-                <button className="text-2xl font-bold text-gray-600">+</button>
-              </div>
-
+      {/* Food Item Detail Modal */}
+      {showPopup && selectedMenuItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
+            <div className="relative h-56">
+              <Image
+                src={selectedMenuItem.picture}
+                alt={selectedMenuItem.name}
+                layout="fill"
+                objectFit="cover"
+              />
               <button
-                className="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 transition duration-200"
                 onClick={handleClose}
+                className="absolute top-4 right-4 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition duration-300"
               >
-                Confirm
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
               </button>
+            </div>
+            
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-800">{selectedMenuItem.name}</h2>
+              <p className="text-gray-600 mt-2">{selectedMenuItem.description}</p>
+              
+              {selectedMenuItem.allergens && selectedMenuItem.allergens.length > 0 && (
+                <div className="mt-4">
+                  <h3 className="font-medium text-gray-700 mb-2">Allergens:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMenuItem.allergens.map((allergen, index) => {
+                      const allergenNames = Array.isArray(allergen.name)
+                        ? allergen.name
+                        : [allergen.name];
+                      
+                      return allergenNames.map((name, i) => (
+                        <span
+                          key={`${index}-${i}`}
+                          className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-sm"
+                        >
+                          {name}
+                        </span>
+                      ));
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-6 flex items-center justify-between">
+                <div className="font-bold text-xl text-gray-900">฿{selectedMenuItem.price.toFixed(2)}</div>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    onClick={decrementQuantity}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition duration-300"
+                  >
+                    -
+                  </button>
+                  <div className="px-4 py-2 font-medium">{quantity}</div>
+                  <button
+                    onClick={incrementQuantity}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 transition duration-300"
+                  >
+                    +
+                  </button>
+                </div>
+              </div> 
             </div>
           </div>
         </div>
