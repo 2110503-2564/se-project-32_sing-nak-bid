@@ -15,9 +15,6 @@ type InnerOrderItem = {
   menuName: string;
   quantity: number;
   note?: string;
-  // อาจมี orderCount และ stockCount ใน InnerOrderItem หรือต้องดึงจาก Menu Item
-  orderCount?: number;
-  stockCount?: number;
 };
 
 type OrderItem = {
@@ -35,6 +32,23 @@ type OrderItem = {
   __v: number;
 };
 
+type MenuItem = {
+  _id: string;
+  name: string;
+  price: number;
+  description: string;
+  orderCount?: number;
+  stockCount?: number;
+};
+
+type Restaurant = {
+  _id: string;
+  name: string;
+  address: string;
+  tel: string;
+  id: string;
+};
+
 type Reservation = {
   _id: string;
   reservationDateTime: string;
@@ -43,13 +57,7 @@ type Reservation = {
     email: string;
     name?: string;
   };
-  restaurant: {
-    _id: string;
-    name: string;
-    address: string;
-    tel: string;
-    id: string;
-  };
+  restaurant: Restaurant;
   status: "pending" | "confirmed" | "cancelled";
   createdAt: string;
   __v: number;
@@ -91,6 +99,32 @@ const updateMenu = async (
   } catch (error: any) {
     console.error("Error updating menu:", error.message);
     throw error;
+  }
+};
+
+const getMenuById = async (token: string, restaurantId: string, menuId: string): Promise<MenuItem | null> => {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/v1/restaurants/${restaurantId}/menu/${menuId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      console.error(`Failed to fetch menu item ${menuId}:`, response.statusText);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.data; // Assuming the menu item data is directly in data
+  } catch (error: any) {
+    console.error(`Error fetching menu item ${menuId}:`, error.message);
+    return null;
   }
 };
 
@@ -175,14 +209,22 @@ export default function ManagerPage() {
 
         if (completedOrder) {
           for (const item of completedOrder.orderItems) {
-            const { menuItem, quantity, orderCount: itemOrderCount, stockCount: itemStockCount } = item;
-            console.log("InnerOrderItem (onDrop):", item);
+            const { menuItem, quantity } = item;
 
-            const newOrderCount = (itemOrderCount || 0) + quantity;
-            const newStockCount = (itemStockCount || 0) - quantity;
+            const currentMenuData = await getMenuById(session.user.token, restaurantId, menuItem);
 
-            console.log(`Updating menu ${menuItem} (onDrop): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
-            await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+            if (currentMenuData) {
+              const currentOrderCount = currentMenuData.orderCount || 0;
+              const currentStockCount = currentMenuData.stockCount || 0;
+
+              const newOrderCount = currentOrderCount + quantity;
+              const newStockCount = currentStockCount - quantity;
+
+              console.log(`Updating menu ${menuItem} (onDrop): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
+              await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+            } else {
+              console.error(`Could not find menu item with ID: ${menuItem}`);
+            }
           }
         }
       }
@@ -241,14 +283,22 @@ export default function ManagerPage() {
 
         if (completedOrder) {
           for (const item of completedOrder.orderItems) {
-            const { menuItem, quantity, orderCount: itemOrderCount, stockCount: itemStockCount } = item;
-            console.log("InnerOrderItem (click):", item);
+            const { menuItem, quantity } = item;
 
-            const newOrderCount = (itemOrderCount || 0) + quantity;
-            const newStockCount = (itemStockCount || 0) - quantity;
+            const currentMenuData = await getMenuById(session.user.token, restaurantId, menuItem);
 
-            console.log(`Updating menu ${menuItem} (click): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
-            await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+            if (currentMenuData) {
+              const currentOrderCount = currentMenuData.orderCount || 0;
+              const currentStockCount = currentMenuData.stockCount || 0;
+
+              const newOrderCount = currentOrderCount + quantity;
+              const newStockCount = currentStockCount - quantity;
+
+              console.log(`Updating menu ${menuItem} (click): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
+              await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+            } else {
+              console.error(`Could not find menu item with ID: ${menuItem}`);
+            }
           }
         }
       }
@@ -360,7 +410,7 @@ export default function ManagerPage() {
       {error && (
         <div className={styles.error}>
           {error}
-          <button onClick={() => {setError(null); fetchReservations();}}>Try Again</button>
+          <button onClick={() => { setError(null); fetchReservations(); }}>Try Again</button>
         </div>
       )}
 
