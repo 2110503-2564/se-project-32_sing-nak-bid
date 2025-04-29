@@ -8,18 +8,16 @@ import updateOrderStatus from "@/libs/updateOrderStatus";
 import Link from "next/link";
 // Import icons
 import { ClipboardList, Clock, CheckCircle, Coffee, DollarSign, Star } from "lucide-react";
-import updateMenu from "@/libs/updateMenu";
 
 type InnerOrderItem = {
   _id: string;
-  menuItem: {
-    _id: string;
-    name: string;
-    orderCount: number;
-  };
+  menuItem: string; // menuItem ตอนนี้เป็น String ที่เก็บ _id
   menuName: string;
   quantity: number;
   note?: string;
+  // อาจมี orderCount และ stockCount ใน InnerOrderItem หรือต้องดึงจาก Menu Item
+  orderCount?: number;
+  stockCount?: number;
 };
 
 type OrderItem = {
@@ -62,6 +60,40 @@ type Reservation = {
 // Define workflow order
 const ORDER_STATES = ["pending", "preparing", "completed"];
 
+const updateMenu = async (
+  token: string,
+  restaurantId: string,
+  menuId: string,
+  updateData: { orderCount?: number; stockCount?: number }
+) => {
+  try {
+    const response = await fetch(
+      `http://localhost:5000/api/v1/restaurants/${restaurantId}/menu/${menuId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // ใส่ token หาก API ต้องการ
+        },
+        body: JSON.stringify(updateData),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Failed to update menu:", errorData);
+      throw new Error(`Failed to update menu: ${response.statusText}`);
+    }
+
+    const updatedMenu = await response.json();
+    console.log("Menu updated successfully:", updatedMenu);
+    return updatedMenu;
+  } catch (error: any) {
+    console.error("Error updating menu:", error.message);
+    throw error;
+  }
+};
+
 export default function ManagerPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,17 +110,17 @@ export default function ManagerPage() {
       try {
         const bookings = await getReserves(session.user.token as string);
         setReservations(bookings.data);
-        
+
         // Extract restaurant ID from the first reservation if available
         if (bookings.data.length > 0 && bookings.data[0].restaurant?._id) {
           setRestaurantId(bookings.data[0].restaurant._id);
         }
-        
+
         // Calculate total revenue from completed orders
         const completedOrders = bookings.data
           .flatMap(reservation => reservation.orderItems || [])
           .filter(order => order?.status === "completed");
-          
+
         const revenue = completedOrders.reduce((total, order) => total + (order.totalPrice || 0), 0);
         setTotalRevenue(revenue);
       } catch (error: any) {
@@ -116,21 +148,21 @@ export default function ManagerPage() {
     e.preventDefault();
     const orderItemId = e.dataTransfer.getData("text/plain");
     const currentStatus = e.dataTransfer.getData("currentStatus");
-    
+
     if (!session?.user?.token) {
       setError("You are not logged in. Please log in again.");
       return;
     }
-    
+
     // Prevent backward movement in workflow
     const currentIndex = ORDER_STATES.indexOf(currentStatus);
     const newIndex = ORDER_STATES.indexOf(newStatus);
-    
+
     if (newIndex < currentIndex) {
       setError("Unable to move the order back to its previous status");
       return;
     }
-    
+
     // Update on the server
     try {
       await updateOrderStatus(orderItemId, newStatus, session.user.token);
@@ -140,22 +172,27 @@ export default function ManagerPage() {
         const completedOrder = reservations
           .flatMap(reservation => reservation.orderItems || [])
           .find(order => order._id === orderItemId);
-  
+
         if (completedOrder) {
-          completedOrder.orderItems.forEach(async menuItem => {
-            console.log(` menuItem: ${menuItem.menuItem}, quan+orderCount: ${menuItem.quantity}+${menuItem.menuItem.orderCount}`);
-            await updateMenu(session.user.token, restaurantId, menuItem.menuItem._id, menuItem.quantity+menuItem.menuItem.orderCount);
-            
-          });
+          for (const item of completedOrder.orderItems) {
+            const { menuItem, quantity, orderCount: itemOrderCount, stockCount: itemStockCount } = item;
+            console.log("InnerOrderItem (onDrop):", item);
+
+            const newOrderCount = (itemOrderCount || 0) + quantity;
+            const newStockCount = (itemStockCount || 0) - quantity;
+
+            console.log(`Updating menu ${menuItem} (onDrop): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
+            await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+          }
         }
       }
-      
+
       // If moving to completed, refresh data to update revenue
       fetchReservations();
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
       setError("Failed to update order status. Please try again");
-      
+
       // Revert optimistic update if API call fails
       fetchReservations();
     }
@@ -164,11 +201,11 @@ export default function ManagerPage() {
   const allowDrop = (e: React.DragEvent<HTMLDivElement>, targetStatus: string) => {
     // Get the current status from dataTransfer
     const currentStatus = e.dataTransfer.getData("currentStatus");
-    
+
     // Only allow drop if it's a forward movement in the workflow
     const currentIndex = ORDER_STATES.indexOf(currentStatus);
     const targetIndex = ORDER_STATES.indexOf(targetStatus);
-    
+
     if (currentIndex < targetIndex || currentStatus === "") {
       e.preventDefault(); // Allow the drop
     }
@@ -179,9 +216,9 @@ export default function ManagerPage() {
       setError("You are not logged in. Please log in again.");
       return;
     }
-    
+
     let nextStatus: OrderItem["status"] = "pending";
-    
+
     // Determine next status based on current status
     if (currentStatus === "pending") {
       nextStatus = "preparing";
@@ -191,7 +228,7 @@ export default function ManagerPage() {
       // No change if already completed
       return;
     }
-    
+
     // Update on server
     try {
       await updateOrderStatus(orderItemId, nextStatus, session.user.token as string);
@@ -201,21 +238,27 @@ export default function ManagerPage() {
         const completedOrder = reservations
           .flatMap(reservation => reservation.orderItems || [])
           .find(order => order._id === orderItemId);
-          
+
         if (completedOrder) {
-          completedOrder.orderItems.forEach(async menuItem => {
-            console.log(` menuItem: ${menuItem.menuItem}, quan+orderCount: ${menuItem.quantity}+${menuItem.menuItem.orderCount}`);
-            await updateMenu(session.user.token, restaurantId, menuItem.menuItem._id, menuItem.quantity,); 
-          });
+          for (const item of completedOrder.orderItems) {
+            const { menuItem, quantity, orderCount: itemOrderCount, stockCount: itemStockCount } = item;
+            console.log("InnerOrderItem (click):", item);
+
+            const newOrderCount = (itemOrderCount || 0) + quantity;
+            const newStockCount = (itemStockCount || 0) - quantity;
+
+            console.log(`Updating menu ${menuItem} (click): orderCount=${newOrderCount}, stockCount=${newStockCount}`);
+            await updateMenu(session.user.token, restaurantId, menuItem, { orderCount: newOrderCount, stockCount: newStockCount });
+          }
         }
       }
-      
+
       // Refresh data to update revenue if moving to completed
       fetchReservations();
     } catch (error: any) {
       console.error("Failed to update order status:", error.message);
       setError("Failed to update order status. Please try again");
-      
+
       // Revert optimistic update
       fetchReservations();
     }
@@ -258,7 +301,7 @@ export default function ManagerPage() {
                   {orderItem.orderItems.map((item) => (
                     <div key={item._id}>
                       {item.menuName} <div>(หมายเหตุ: {item.note || '-'} )
-                       x {item.quantity}</div>
+                        x {item.quantity}</div>
                     </div>
                   ))}
                   <p>Order by: {orderItem.emailUser || "ไม่ระบุอีเมล"}</p>
@@ -296,14 +339,14 @@ export default function ManagerPage() {
           <ClipboardList size={28} /> Order List
           {isLoading && <span className={styles.loading}> Loading...</span>}
         </div>
-        <button 
-          className={styles.revenueButton} 
+        <button
+          className={styles.revenueButton}
           onClick={toggleRevenueDisplay}
         >
           <DollarSign size={20} /> Revenue
         </button>
       </div>
-      
+
       {showRevenue && (
         <div className={styles.revenuePanel}>
           <h3>Total Revenue from Completed Orders</h3>
@@ -313,25 +356,25 @@ export default function ManagerPage() {
           </div>
         </div>
       )}
-      
+
       {error && (
         <div className={styles.error}>
           {error}
           <button onClick={() => {setError(null); fetchReservations();}}>Try Again</button>
         </div>
       )}
-      
+
       <div className={styles.board}>
         {renderColumn("pending")}
         {renderColumn("preparing")}
         {renderCompleteColumn()}
       </div>
-      
+
       {/* Wrap MenuOrdered in a div with menuSection class */}
       <div className={styles.menuSection}>
         {restaurantId && <MenuOrdered restaurantId={restaurantId} />}
       </div>
-      
+
       {/* View Reviews Button */}
       {restaurantId && (
         <div className={styles.reviewButtonContainer}>

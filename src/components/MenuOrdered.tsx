@@ -4,73 +4,70 @@ import { useState, useEffect } from "react";
 import styles from "./MenuOrdered.module.css";
 import { MenuItemOrdered } from "../../interfaces";
 import getMenus from "@/libs/getMenus";
+import { useSession } from "next-auth/react"; // Import useSession
 // Import icons
 import { Utensils, ShoppingBag, ThumbsUp } from "lucide-react";
 
 interface MenuOrderedProps {
   restaurantId?: string;
+  onMenuUpdated?: boolean; // Prop สำหรับ Trigger การ Re-fetch (optional)
 }
 
-export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
+export default function MenuOrdered({ restaurantId, onMenuUpdated }: MenuOrderedProps) {
   const params = useParams();
   const [menuItems, setMenuItems] = useState<MenuItemOrdered[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session } = useSession(); // Get session data
 
   useEffect(() => {
     const fetchMenuItems = async () => {
-      // Try to get restaurant ID from props first, then from params
       const idToUse = restaurantId || (params?.id && typeof params.id === "string" ? params.id : null);
-      
+
       if (!idToUse) {
         setError("ไม่พบ ID ร้านอาหาร");
         setLoading(false);
         return;
       }
-      
+
       setLoading(true);
       setError(null);
-      
+
       try {
-        // เรียกใช้ getMenus และรับข้อมูล
         const response = await getMenus(idToUse);
-        
-        // Debug: แสดง log เพื่อดูโครงสร้างข้อมูล
-        console.log("API Response:", response);
-        
+        console.log("API Response (MenuOrdered):", response);
+
         let items: MenuItemOrdered[] = [];
-        
-        // ตรวจสอบว่าข้อมูลมีโครงสร้างแบบไหน
-        if (Array.isArray(response)) {
+
+        if (response?.success && Array.isArray(response.data)) {
+          items = response.data;
+        } else if (response?.success && response.data && typeof response.data === 'object' && Array.isArray(Object.values(response.data).find(val => Array.isArray(val)))) {
+          items = Object.values(response.data).find(val => Array.isArray(val)) as MenuItemOrdered[];
+        } else if (Array.isArray(response)) {
           items = response;
         } else if (response && typeof response === 'object') {
-          // ลองตรวจสอบว่ามี data field หรือไม่
           if (Array.isArray(response.data)) {
             items = response.data;
           } else if (response.menus && Array.isArray(response.menus)) {
             items = response.menus;
           } else {
-            // หากไม่พบรูปแบบที่รู้จัก ให้ลองแปลงเป็น array
             const possibleItems = Object.values(response).find(val => Array.isArray(val));
             if (possibleItems) {
               items = possibleItems as MenuItemOrdered[];
             }
           }
         }
-        
-        // สำคัญ: เพิ่มเงื่อนไขให้ orderCount เป็น 0 ถ้าไม่มีค่า และตรวจสอบค่า recommended
+
         items = items.map(item => ({
           ...item,
           orderCount: item.orderCount !== undefined ? item.orderCount : 0,
           recommended: item.recommended !== undefined ? item.recommended : false
         }));
-        
-        // Debug: แสดงข้อมูลหลังจากแปลงแล้ว
-        console.log("Processed items:", items);
-        
+
+        console.log("Processed items (MenuOrdered):", items);
         setMenuItems(items);
       } catch (err) {
-        console.error('Error fetching menu items:', err);
+        console.error('Error fetching menu items (MenuOrdered):', err);
         setError('ไม่สามารถโหลดรายการเมนูได้');
       } finally {
         setLoading(false);
@@ -78,59 +75,60 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
     };
 
     fetchMenuItems();
-  }, [restaurantId, params?.id]);
+  }, [restaurantId, params?.id, onMenuUpdated]);
 
-  const toggleRecommended = async (itemId: string) => {
+  const toggleRecommended = async (itemId: string, currentRecommended: boolean) => {
+    if (!session?.user?.token || !restaurantId) {
+      console.error("Authentication token or restaurant ID not available.");
+      alert("ไม่สามารถอัพเดทสถานะเมนูแนะนำได้ กรุณาลองใหม่อีกครั้ง");
+      return;
+    }
+
     try {
-      const itemToUpdate = menuItems.find(item => item._id === itemId);
-      if (!itemToUpdate) return;
-
-      const newRecommendedValue = !itemToUpdate.recommended;
-      
       // Update UI optimistically
-      setMenuItems(prev => 
-        prev.map(item => 
-          item._id === itemId 
-            ? { ...item, recommended: newRecommendedValue } 
+      setMenuItems(prev =>
+        prev.map(item =>
+          item._id === itemId
+            ? { ...item, recommended: !currentRecommended }
             : item
         )
       );
 
-      // Debug: แสดงข้อมูลการเรียก API
-      const apiUrl = `/api/menu-items/${itemId}/recommend`;
-      console.log(`Sending PATCH request to: ${apiUrl}`);
+      const apiUrl = `http://localhost:5000/api/v1/restaurants/${restaurantId}/menu/${itemId}`;
+      const newRecommendedValue = !currentRecommended;
+
+      console.log(`Sending PUT request to: ${apiUrl}`);
       console.log(`Request body:`, { recommended: newRecommendedValue });
-      
+
       const response = await fetch(apiUrl, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.user.token}`, // Include authorization token
         },
         body: JSON.stringify({ recommended: newRecommendedValue }),
       });
 
       if (!response.ok) {
-        // พยายามอ่านข้อมูล error จาก response
         const errorData = await response.json().catch(() => null);
-        console.error('API error details:', errorData);
+        console.error('API error details (toggleRecommended):', errorData);
         throw new Error(`Failed to update recommendation status: ${response.status}`);
       }
 
-      console.log('Successfully updated recommendation status');
+      console.log('Successfully updated recommendation status (toggleRecommended)');
 
     } catch (err) {
-      console.error('Error updating recommendation status:', err);
-      
+      console.error('Error updating recommendation status (toggleRecommended):', err);
+
       // Revert UI changes on error
-      setMenuItems(prev => 
-        prev.map(item => 
-          item._id === itemId 
-            ? { ...item, recommended: !item.recommended } 
+      setMenuItems(prev =>
+        prev.map(item =>
+          item._id === itemId
+            ? { ...item, recommended: currentRecommended }
             : item
         )
       );
-      
-      // แสดง alert เพื่อแจ้งผู้ใช้
+
       alert('ไม่สามารถอัพเดทสถานะเมนูแนะนำได้ กรุณาลองใหม่อีกครั้ง');
     }
   };
@@ -147,7 +145,6 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
     return <div className={styles.empty}>Menu Not Found</div>;
   }
 
-  // สร้าง sorted array แยกออกมา
   const sortedMenuItems = [...menuItems].sort((a, b) => b.orderCount - a.orderCount);
 
   return (
@@ -180,14 +177,14 @@ export default function MenuOrdered({ restaurantId }: MenuOrderedProps) {
             {sortedMenuItems.map((item) => (
               <tr key={item._id} className={styles.tableRow}>
                 <td className={styles.itemName}>
-                  {item.name} ฿{item.price.toFixed(2)}
+                  {item.name} ฿{item.price?.toFixed(2)}
                 </td>
                 <td className={styles.count}>{item.orderCount}</td>
                 <td className={styles.checkboxCell}>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={item.recommended}
-                    onChange={() => toggleRecommended(item._id)}
+                    onChange={() => toggleRecommended(item._id, item.recommended)}
                     className={styles.checkbox}
                   />
                 </td>
