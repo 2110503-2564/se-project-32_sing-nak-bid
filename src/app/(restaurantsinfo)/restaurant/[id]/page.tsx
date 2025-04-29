@@ -76,8 +76,14 @@ const RestaurantDetailPage = () => {
 
   useEffect(() => {
     if (restaurant?.menuItems) {
+
       const allRestaurantAllergens = new Set<string>();
-      restaurant.menuItems.forEach((item) => {
+
+      const deduplicatedItems = Array.from(
+        new Map(restaurant.menuItems.map(item => [item._id, item])).values()
+      );
+
+      deduplicatedItems.forEach((item) => {
         item.allergens?.forEach((allergen) => {
           if (Array.isArray(allergen.name)) {
             allergen.name.forEach((n) => allRestaurantAllergens.add(n));
@@ -89,18 +95,20 @@ const RestaurantDetailPage = () => {
         });
       });
       setAllergens(Array.from(allRestaurantAllergens));
-      setFilteredMenuItems(restaurant.menuItems);
+      setFilteredMenuItems(deduplicatedItems);
       
       // Filter recommended menu items
-      const recommended = restaurant.menuItems.filter(item => item.recommended === true);
+       const recommended = deduplicatedItems.filter(item => item.recommended === true);
       setRecommendedMenuItems(recommended);
     }
   }, [restaurant?.menuItems]);
 
   useEffect(() => {
     if (restaurant?.menuItems) {
+      let filteredItems = restaurant.menuItems;
+
       if (selectedAllergens.length > 0) {
-        const newFilteredItems = restaurant.menuItems.filter((item) => {
+       filteredItems = filteredItems.filter((item) => {
           if (!item.allergens || item.allergens.length === 0) {
             return true;
           }
@@ -120,9 +128,24 @@ const RestaurantDetailPage = () => {
             }
           });
         });
-        setFilteredMenuItems(newFilteredItems);
+        const deduplicateFilteredItems = Array.from(
+          new Map(filteredItems.map(item => [item._id, item])).values()
+        );
+
+        //add set recommended menu
+        setFilteredMenuItems(deduplicateFilteredItems);
+        setRecommendedMenuItems(deduplicateFilteredItems.filter(item=> item.recommended === true));
       } else {
-        setFilteredMenuItems(restaurant.menuItems);
+        //add this to not have a duplicated item when filtered
+        const deduplicatedItems = Array.from(
+          new Map(restaurant.menuItems.map(item => [item._id, item])).values()
+        );
+  
+//add set recommended menu after not filter
+        setFilteredMenuItems(deduplicatedItems);
+        setRecommendedMenuItems(
+          deduplicatedItems.filter(item => item.recommended === true)
+        );
       }
     }
   }, [selectedAllergens, restaurant?.menuItems]);
@@ -333,17 +356,7 @@ const RestaurantDetailPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Recommended Menu Section */}
-      {recommendedMenuItems.length > 0 && (
-        <div className="w-full md:w-3/4 lg:w-1/2 mt-8">
-          <RecommendedMenu menuItems={recommendedMenuItems} />
-        </div>
-      )}
-
-      <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
-        <div className="relative inline-block">
+      <div className="relative inline-block right-0">
           <button
             ref={filterButtonRef}
             onClick={toggleFilterDropdown}
@@ -401,6 +414,24 @@ const RestaurantDetailPage = () => {
             </div>
           )}
         </div>
+
+
+        {/* for recommendemenu to not show the duplicate menu */}
+        {recommendedMenuItems.length > 0 && (
+  <div className="w-full md:w-3/4 lg:w-1/2 mt-8">
+    {/* Deduplicate recommendedMenuItems before passing to the RecommendedMenu */}
+    <RecommendedMenu
+      menuItems={Array.from(new Map(recommendedMenuItems.map(item => [item._id, item])).values()).map((item, index) => ({
+        ...item,
+        key: item._id + '-' + index // Ensuring the key is unique by appending the index
+      }))}
+    />
+  </div>
+)}
+
+      <div className="w-full md:w-3/4 lg:w-1/2 mt-8 flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold text-red-700">Menu</h2>
+ 
       </div>
       <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 w-full md:w-3/4 lg:w-1/2">
         {filteredMenuItems &&
