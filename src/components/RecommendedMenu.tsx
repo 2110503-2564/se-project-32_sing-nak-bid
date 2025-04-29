@@ -60,8 +60,8 @@ export default function RecommendedMenu({ menuItems }: RecommendedMenuProps) {
       
       <div className={styles.menuGrid}>
         {recommendedItems.length > 0 ? (
-          recommendedItems.map((item) => (
-            <div key={item._id} className={styles.menuCard}>
+          recommendedItems.map((item,index) => (
+            <div key={item._id + '-' + index} className={styles.menuCard}> {/* Ensure unique key */}
               <img 
                 src="/img/menu.png" 
                 alt={item.name} 
