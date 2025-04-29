@@ -12,6 +12,7 @@ import getOrders from "@/libs/getOrders";
 import getOrder from "@/libs/getOrder";
 import deleteOrder from "@/libs/deleteOrder";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 {
   /* <div class="w-[250px] bg-white rounded-[10px] border border-silver p-[10px] m-[5px]">
@@ -135,7 +136,7 @@ export default function MyOrder() {
             
               
             <div key={ordersItem._id} className="mb-4 bg-white/40 p-3 rounded-md flex items-start">
-  <img src="/img/Food3.jpg" alt="Food" className="w-[30%] h-auto mr-4 rounded border border-gray-300" />
+  <Image src={ordersItem.restaurant.picture} alt="Food" width={500} height={500} className="w-[30%] h-auto mr-4 rounded border border-gray-300" />
   <div>
    <div className="text-lg mb-1">
     <span className="font-semibold">Restaurant:</span>{" "}

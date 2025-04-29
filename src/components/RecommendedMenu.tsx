@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import styles from "./RecommendedMenu.module.css";
+import Image from "next/image";
 
 interface MenuItem {
   _id: string;
@@ -14,6 +15,7 @@ interface MenuItem {
     name: string[] | string;
     description: string[];
   }[];
+  picture : string;
 }
 
 interface RecommendedMenuProps {
@@ -67,9 +69,11 @@ export default function RecommendedMenu({
         {recommendedItems.length > 0 ? (
           recommendedItems.map((item, index) => (
             <div key={item._id + '-' + index} className={styles.menuCard}>
-              <img
-                src="/img/menu.png"
+              <Image
+                src={item.picture}
                 alt={item.name}
+                width={500}
+                height={300}
                 className={styles.menuImage}
               />
               <div className={styles.menuContent}>

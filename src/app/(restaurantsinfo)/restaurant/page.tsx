@@ -1,7 +1,7 @@
 import getRestaurants from "@/libs/getRestaurants";
 import { Suspense } from "react";
 import { LinearProgress } from "@mui/material";
-import { RestaurantJson } from "../../../../interfaces";
+import { RestaurantJson,Restaurant } from "../../../../interfaces";
 import RestaurantCard from "@/components/RestaurantCard"; //delete import HotelJson from interfaces.tsx
 import Link from "next/link";
 
@@ -32,7 +32,7 @@ export default async function Restaurantpage() {
               >
                 <RestaurantCard
                   restaurantname={restaurantitem.name}
-                  imgSrc="/img/Food3.jpg"
+                  imgSrc={restaurantitem.picture}
                   restaurantaddress={restaurantitem.district}
                 />
               </Link>
