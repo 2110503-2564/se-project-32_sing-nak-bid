@@ -101,6 +101,7 @@ export default function ReviewPage({ params }: { params: { id: string } }) {
           <Rating
             className={styles.rating}
             id="rating"
+            data-testid="rating-stars"
             value={rating}
             onChange={(_, newValue) => setRating(newValue)}
             precision={0.5}
