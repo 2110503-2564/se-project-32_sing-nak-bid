@@ -7,7 +7,7 @@ test('manager can see customer reviews', async ({ page }) => {
     await page.click('button[type="submit"]');
 
     await page.goto('http://localhost:3000/restaurant/6800ac02f3ba9b608b7eed11');
-    await page.getByRole('button', { name: /View review/i }).click();
+    await page.getByRole('button', { name: /View Reviews/i }).click();
     
     await expect(page.getByRole('heading', { name: /Customer Reviews/i })).toBeVisible();
 

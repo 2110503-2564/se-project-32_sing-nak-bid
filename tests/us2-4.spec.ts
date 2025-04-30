@@ -13,7 +13,7 @@ test('admin can delete a review successfully', async ({ page }) => {
 
     await page.waitForLoadState('networkidle');
 
-    await page.getByRole('heading', { name: /Jeh-O Chula/i }).click();
+    await page.getByRole('heading', { name: /Louisvanich/i }).click();
     await page.locator('button[title="Delete Review"]').first().click();
     await page.getByRole('button', { name: /Confirm/i }).click();
 

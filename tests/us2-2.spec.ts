@@ -10,9 +10,9 @@ test.beforeEach(async ({ page }) => {
 test('customer can see recommended dishes', async ({ page }) => {
   await page.goto('http://localhost:3000/restaurant/6800ab45f3ba9b608b7eed0e');
  
-  await expect(page.getByRole('heading', { name: /Recommended Menu/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Chef's Recommendations/i })).toBeVisible();
 
-  const recommendedItems = page.locator('div').filter({ hasText: 'Recommended' });
+  const recommendedItems = page.locator('div').filter({ hasText: 'Popular' });
   
   await expect(recommendedItems.first()).toBeVisible();
 });

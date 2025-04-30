@@ -9,6 +9,7 @@ test.beforeEach(async ({ page }) => {
 
 test('customer can submit a review successfully', async ({ page }) => {
   await page.goto('http://localhost:3000/review/6800ab45f3ba9b608b7eed0e');
+  await page.waitForLoadState('networkidle');
 
   await page.fill('#name', 'อารัน');
 
@@ -19,7 +20,7 @@ test('customer can submit a review successfully', async ({ page }) => {
     await page.mouse.click(box.x + box.width * 0.9, box.y + box.height / 2);
   }
 
-  await page.fill('#comment', 'อร่อยรอบที่ n');
+  await page.fill('#comment', 'หรอยนัดแต่หว้า');
 
   page.once('dialog', async (dialog) => {
     console.log('Alert text:', dialog.message());
@@ -34,6 +35,7 @@ test('customer can submit a review successfully', async ({ page }) => {
 
 test('customer submits review without comment', async ({ page }) => {
   await page.goto('http://localhost:3000/review/6800ab45f3ba9b608b7eed0e');
+  await page.waitForLoadState('networkidle');
 
   await page.fill('#name', 'อารัน');
 
@@ -57,6 +59,7 @@ test('customer submits review without comment', async ({ page }) => {
 
 test('customer submits review without name', async ({ page }) => {
   await page.goto('http://localhost:3000/review/6800ab45f3ba9b608b7eed0e');
+  await page.waitForLoadState('networkidle');
 
   const rating = page.getByTestId('rating-stars');
   await rating.hover();
@@ -65,7 +68,7 @@ test('customer submits review without name', async ({ page }) => {
     await page.mouse.click(box.x + box.width * 0.9, box.y + box.height / 2);
   }
   
-  await page.fill('#comment', 'อร่อยรอบที่ n');
+  await page.fill('#comment', 'มันเป็นตาแซ่บ แซ่บบั่กคัก');
 
   page.once('dialog', async (dialog) => {
     console.log('Alert text:', dialog.message());
